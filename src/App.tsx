@@ -29,7 +29,6 @@ function App() {
   }
 
   if (errorMessage) {
-    console.log(errorMessage);
     return <ErrorApp />;
   }
 
@@ -113,7 +112,7 @@ function UserApp({ role }: { role: string }) {
         if (role === "admin") {
           return <AdminUserApp />;
         }
-        if (role === "user") {
+        if (role === "basic") {
           return <BasicUserApp />;
         }
 
