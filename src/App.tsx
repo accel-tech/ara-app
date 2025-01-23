@@ -29,6 +29,7 @@ function App() {
   }
 
   if (errorMessage) {
+    console.log(errorMessage);
     return <ErrorApp />;
   }
 
