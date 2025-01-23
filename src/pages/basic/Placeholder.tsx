@@ -1,9 +1,6 @@
 import {
-  Button,
   EmptyState,
-  EmptyStateActions,
   EmptyStateBody,
-  EmptyStateFooter,
   PageSection,
 } from "@patternfly/react-core";
 import { UserIcon } from "@patternfly/react-icons";

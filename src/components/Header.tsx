@@ -6,9 +6,6 @@ import {
   MenuToggle,
   MenuToggleElement,
   Avatar,
-  NotificationBadge,
-  Button,
-  ButtonVariant,
   MastheadToggle,
   PageToggleButton,
 } from "@patternfly/react-core";
@@ -24,11 +21,7 @@ import defaultAvatar from "../static/avatar.svg";
 import { usePreferencesModal } from "./ToolsWrapper";
 import { typedUseStoreState } from "../store";
 import { Link } from "react-router-dom";
-import {
-  BellIcon as _BellIcon,
-  BarsIcon,
-  QuestionCircleIcon,
-} from "@patternfly/react-icons";
+import { BellIcon as _BellIcon, BarsIcon } from "@patternfly/react-icons";
 
 export const Header: React.FC<{
   toggleSidebar: () => void;

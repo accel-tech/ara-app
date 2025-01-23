@@ -1,12 +1,9 @@
 import {
-  Button,
   EmptyState,
-  EmptyStateActions,
   EmptyStateBody,
-  EmptyStateFooter,
   PageSection,
 } from "@patternfly/react-core";
-import { CogIcon, CubesIcon } from "@patternfly/react-icons";
+import { CogIcon } from "@patternfly/react-icons";
 
 export default function Placeholder() {
   return (
