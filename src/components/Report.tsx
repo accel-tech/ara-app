@@ -37,13 +37,13 @@ export const Report: FC<{ departmentId: string }> = ({ departmentId }) => {
     setLoading(true);
     const query = [`departmentId=${departmentId}`];
     const { data, error } = await httpRequest<{}>(
-      `/reports/single?${query.join("&")}`
+      `/reports/find?${query.join("&")}`
     );
     setLoading(false);
     if (error) {
       console.log(error, "Failed to fetch report");
       setError(error.message);
-    } else if (data) {
+    } else if (data && Object.keys(data).length > 0) {
       setReport(data);
     }
   }
@@ -99,7 +99,7 @@ export const Report: FC<{ departmentId: string }> = ({ departmentId }) => {
         >
           <EmptyStateBody>
             We were unable to fetch your report. Try again later or contact your
-            system administator.
+            system administrator.
           </EmptyStateBody>
         </EmptyState>
       );
@@ -119,7 +119,7 @@ export const Report: FC<{ departmentId: string }> = ({ departmentId }) => {
                 <span style={{ fontWeight: 500, textDecoration: "underline" }}>
                   Latest
                 </span>{" "}
-                report could not be found
+                report was not found
               </p>
             ) : (
               <p>
@@ -129,7 +129,7 @@ export const Report: FC<{ departmentId: string }> = ({ departmentId }) => {
                   {" - "}
                   {fmtDate1(dateToWeekRange(filters.date).endOfWeek)}
                 </span>{" "}
-                could not be found
+                was not found
               </p>
             )}
           </EmptyStateBody>
