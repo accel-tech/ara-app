@@ -53,6 +53,7 @@ export const useInitAuth = () => {
               name: data.name,
               email: data.email,
               role: data.role,
+              departmentAccess: data.departmentAccess,
             },
           });
         } else {

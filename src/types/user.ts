@@ -10,6 +10,12 @@ interface Admin extends BaseUser {
 
 interface Basic extends BaseUser {
   role: "basic";
+  departmentAccess: {
+    _id: string;
+    title: string;
+    category: string;
+    access: "member" | "lead";
+  }[];
 }
 
 export type User = Admin | Basic;

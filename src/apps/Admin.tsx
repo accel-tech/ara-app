@@ -38,7 +38,7 @@ export default function AdminUserApp() {
           >
             <Routes>
               <Route path="/api" Component={() => <API />} />
-              <Route path="*" Component={() => <Placeholder />} />
+              <Route path="/" Component={() => <Placeholder />} />
             </Routes>
           </Page>
         </ToolsWrapper>

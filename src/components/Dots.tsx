@@ -3,7 +3,7 @@ import { cl } from "../utils/misc";
 
 export const Dots: FC<
   { isAnimating: boolean; speed?: number } & HTMLProps<HTMLDivElement>
-> = ({ isAnimating, speed = 500, className, ...props }) => {
+> = ({ isAnimating, speed = 500, ...props }) => {
   const [dots, setDots] = useState("");
   let timeout = useRef<number>().current;
 
@@ -30,9 +30,9 @@ export const Dots: FC<
     }
   }, [dots, isAnimating]);
   return (
-    <span className={cl("relative", className)} {...props}>
-      <span className="opacity-0">...</span>
-      <span className="left-0 absolute">{dots}</span>
+    <span style={{ position: "relative" }} {...props}>
+      <span style={{ opacity: 0 }}>...</span>
+      <span style={{ position: "absolute", left: 0 }}>{dots}</span>
     </span>
   );
 };
