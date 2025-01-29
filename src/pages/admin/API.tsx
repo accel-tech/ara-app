@@ -20,7 +20,10 @@ import { useFetch } from "../../hooks/useFetch";
 import { useConfirmModal } from "../../components/ToolsWrapper";
 import { useMemo, useState } from "react";
 
-const presetGroups = [
+const presetGroups: {
+  title: string;
+  presets: { label: string; route: string; method: string; body?: string }[];
+}[] = [
   {
     title: "Departments",
     presets: [
@@ -40,11 +43,41 @@ const presetGroups = [
         label: "Edit Department",
         route: "/departments/:id",
         method: "PATCH",
-        body: JSON.stringify({
-          title: "",
-          category: "technical",
-          reportKind: "r&d",
-        }),
+        body: JSON.stringify(
+          {
+            title: "",
+            category: "technical",
+            reportKind: "r&d",
+          },
+          null,
+          2
+        ),
+      },
+    ],
+  },
+  {
+    title: "Users",
+    presets: [
+      { label: "List Users", route: "/users", method: "GET" },
+      { label: "Get User", route: "/users/:id", method: "GET" },
+      { label: "Edit User", route: "/users/:id", method: "PATCH", body: "{}" },
+      {
+        label: "Edit User Department Access",
+        route: "/users/:id",
+        method: "PATCH",
+        body: JSON.stringify(
+          {
+            departmentAccess: [
+              {
+                _id: "679a1c64ae7067e861be6233",
+                title: "Research and Development",
+                access: "lead",
+              },
+            ],
+          },
+          null,
+          2
+        ),
       },
     ],
   },
@@ -53,11 +86,15 @@ const presetGroups = [
 export default function API() {
   const httpRequest = useFetch();
 
+  const [presetsExpanded, setPresetsExpanded] = useState(false);
+
   const blank_fields = {
     route: "",
     method: "GET",
   };
-  const [response, setResponse] = useState<string | undefined>(undefined);
+  const [response, setResponse] = useState<
+    { status: number; body: string } | undefined
+  >(undefined);
   const [fields, setFields] = useState<{
     route: string;
     method: string;
@@ -92,19 +129,27 @@ export default function API() {
     setLoading(true);
     const headers = new Headers();
 
-    const res = await httpRequest(fields.route, {
+    const { responseStatus, ...res } = await httpRequest(fields.route, {
       headers,
       method: fields.method,
-      body: fields.body ? fields.body : undefined,
+      body: fields.method !== "GET" && fields.body ? fields.body : undefined,
     });
     setLoading(false);
-    setResponse(JSON.stringify(res, null, 2));
+    setResponse({
+      status: responseStatus || 0,
+      body: JSON.stringify(res, null, 2),
+    });
   }
 
   return (
     <PageSection isFilled isCenterAligned hasBodyWrapper={false}>
       <Title headingLevel="h2">Manual API Requests</Title>
-      <ExpandableSection toggleText="Sample API Requests">
+      <ExpandableSection
+        isExpanded={presetsExpanded}
+        onToggle={(_e, isExpanded) => setPresetsExpanded(isExpanded)}
+        toggleText="Sample API Requests"
+        displaySize="lg"
+      >
         {presetGroups.map((group) => (
           <div key={group.title}>
             <Button variant="plain" isDisabled>
@@ -116,13 +161,14 @@ export default function API() {
                   <Button
                     variant="link"
                     key={preset.label}
-                    onClick={() =>
+                    onClick={() => {
                       setFields({
                         route: preset.route,
                         method: preset.method,
                         body: preset.body,
-                      })
-                    }
+                      });
+                      setPresetsExpanded(false);
+                    }}
                   >
                     {preset.label}
                   </Button>
@@ -133,7 +179,7 @@ export default function API() {
         ))}
       </ExpandableSection>
 
-      <Form isHorizontal>
+      <Form isHorizontal onSubmit={handleSubmit}>
         <FormGroup label="Method" fieldId="horizontal-form-title">
           <FormSelect
             value={fields.method}
@@ -158,7 +204,7 @@ export default function API() {
           />
         </FormGroup>
 
-        {typeof fields.body === "string" && (
+        {typeof fields.body === "string" && fields.method !== "GET" && (
           <FormGroup label="Body">
             <TextArea
               value={fields.body}
@@ -174,18 +220,32 @@ export default function API() {
         <Checkbox
           id="useBody"
           label="Send JSON body"
-          isChecked={typeof fields.body === "string"}
+          isChecked={typeof fields.body === "string" && fields.method !== "GET"}
           onChange={(_e, isChecked) =>
             setFields({ ...fields, body: isChecked ? "{}" : undefined })
           }
-          isDisabled={isLoading}
+          isDisabled={isLoading || fields.method === "GET"}
         />
       </Form>
 
       <Form style={{ maxHeight: 600, overflowY: "scroll" }}>
-        <FormGroup label="Response" fieldId="horizontal-form-title">
+        <FormGroup
+          label={
+            response ? (
+              <>
+                Response{" "}
+                <span style={{ color: getStatusColor(response.status) }}>
+                  ({response.status})
+                </span>
+              </>
+            ) : (
+              "Response"
+            )
+          }
+          fieldId="horizontal-form-title"
+        >
           <CodeBlock style={{ minHeight: 300 }}>
-            <CodeBlockCode id="code-content">{response}</CodeBlockCode>
+            <CodeBlockCode id="code-content">{response?.body}</CodeBlockCode>
           </CodeBlock>
         </FormGroup>
       </Form>
@@ -194,4 +254,10 @@ export default function API() {
       </Button>
     </PageSection>
   );
+}
+
+function getStatusColor(status: number) {
+  if ([200, 201, 202].includes(status)) return "green";
+  if ([400, 403, 500].includes(status)) return "red";
+  return "black";
 }

@@ -8,7 +8,11 @@ export function useFetch() {
     config: RequestInit = {},
     allowRetry = true,
     overwriteBaseUrl?: string
-  ): Promise<{ error?: { message: string; fields?: string[] }; data?: T }> {
+  ): Promise<{
+    error?: { message: string; fields?: string[] };
+    data?: T;
+    responseStatus: number;
+  }> {
     if (keycloak.isTokenExpired()) {
       await keycloak.updateToken(10);
     }
@@ -38,11 +42,17 @@ export function useFetch() {
           await keycloak.updateToken(10);
           return await httpRequest(path, config, false);
         }
-        return { error: error || { message: "Failed to perform request" } };
+        return {
+          error: error || { message: "Failed to perform request" },
+          responseStatus: response.status,
+        };
       }
-      return { data: data || {} };
+      return { data: data || {}, responseStatus: response.status };
     } catch (err) {
-      return { error: { message: "Failed to perform request" } };
+      return {
+        error: { message: "Failed to perform request" },
+        responseStatus: 0,
+      };
     }
   }
 
