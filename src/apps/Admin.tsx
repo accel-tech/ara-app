@@ -1,11 +1,12 @@
 import { Page } from "@patternfly/react-core";
 import { Fragment, useState } from "react";
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Header } from "../components/Header";
 import { ToolsWrapper } from "../components/ToolsWrapper";
 import { AppEnvironemntBanner } from "../components/AppEnvironmentBanner";
 import { Sidebar } from "../components/Sidebar";
 import Placeholder from "../pages/admin/Placeholder";
+import API from "../pages/admin/API";
 
 export default function AdminUserApp() {
   const [isSidebarOpen, setSidebarOpen] = useState(true);
@@ -35,7 +36,10 @@ export default function AdminUserApp() {
             }}
             isContentFilled
           >
-            <Placeholder />
+            <Routes>
+              <Route path="/api" Component={() => <API />} />
+              <Route path="*" Component={() => <Placeholder />} />
+            </Routes>
           </Page>
         </ToolsWrapper>
       </BrowserRouter>
