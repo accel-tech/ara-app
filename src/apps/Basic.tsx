@@ -9,7 +9,7 @@ import Placeholder from "../pages/basic/Placeholder";
 import Department from "../pages/basic/Department";
 
 export default function BasicUserApp() {
-  const [isSidebarOpen, setSidebarOpen] = useState(true);
+  const [isSidebarOpen, setSidebarOpen] = useState(false);
 
   function toggleSidebar() {
     setSidebarOpen((currentVal) => !currentVal);

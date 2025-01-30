@@ -9,6 +9,7 @@ import {
 import { UserPreferencesModal } from "./UserPreferencesModal";
 import { ConfirmModal } from "./ConfirmModal";
 import { ToastAlert, Toasts } from "./Toasts";
+import { CreateReportModal } from "./CreateReportModal";
 
 type context = {
   openPreferencesModal: () => void;
@@ -17,12 +18,14 @@ type context = {
     confirmPrompt: string;
   }) => void;
   showToast: (alert: Omit<ToastAlert, "key">) => void;
+  openCreateReportModal: (departmentId: string) => void;
 };
 
 const context = createContext<context>({
   openPreferencesModal: () => {},
   openConfirmModal: (_args) => {},
   showToast: (_args) => {},
+  openCreateReportModal: (_departmentId: string) => {},
 });
 
 export const ToolsWrapper: FC<PropsWithChildren> = ({ children }) => {
@@ -34,6 +37,10 @@ export const ToolsWrapper: FC<PropsWithChildren> = ({ children }) => {
   }>({ onConfirm: null, confirmPrompt: "" });
 
   const [toastAlerts, setToastAlerts] = useState<ToastAlert[]>([]);
+
+  const [createReportModalDepartmentId, setCreateReportDepartmentId] = useState<
+    string | null
+  >(null);
 
   function openPreferencesModal() {
     setPreferencesModalOpen(true);
@@ -50,15 +57,25 @@ export const ToolsWrapper: FC<PropsWithChildren> = ({ children }) => {
     setToastAlerts([...toastAlerts, { ...arg, key: toastAlerts.length + 1 }]);
   }
 
+  function openCreateReportModal(departmentId: string) {
+    setCreateReportDepartmentId(departmentId);
+  }
+
   return (
     <context.Provider
       value={{
         openPreferencesModal,
         openConfirmModal,
         showToast,
+        openCreateReportModal,
       }}
     >
       {children}
+      <CreateReportModal
+        isOpen={!!createReportModalDepartmentId}
+        onClose={() => setCreateReportDepartmentId(null)}
+        departmentId={createReportModalDepartmentId}
+      />
       <UserPreferencesModal
         isOpen={preferencesModalOpen}
         onClose={() => setPreferencesModalOpen(false)}
@@ -89,4 +106,8 @@ export const useConfirmModal = () => {
 
 export const useToast = () => {
   return useContext(context).showToast;
+};
+
+export const useCreateReportModal = () => {
+  return useContext(context).openCreateReportModal;
 };

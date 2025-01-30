@@ -88,5 +88,5 @@ export function fmtDate1(date: Date, month?: "short" | "long") {
     day: "numeric",
   };
 
-  return new Intl.DateTimeFormat("en-US", options).format(date); // format to Jan. 29
+  return new Intl.DateTimeFormat("en-US", options).format(new Date(date)); // format to Jan. 29
 }
