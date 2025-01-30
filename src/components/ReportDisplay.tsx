@@ -22,6 +22,7 @@ import { ReportProjects } from "./ReportProjects";
 import { ReportCertifications } from "./ReportCertifications";
 import { ReportNotes } from "./ReportNotes";
 import { useDepartmentAccess } from "../hooks/useDepartmentAccess";
+import { PlusIcon } from "@patternfly/react-icons";
 
 export const ReportDisplay: FC<{ report: Report }> = ({ report }) => {
   const access = useDepartmentAccess(report.department._id);
@@ -90,7 +91,11 @@ export const ReportDisplay: FC<{ report: Report }> = ({ report }) => {
             <Title headingLevel="h3" style={{ marginBottom: 10 }}>
               Projects
             </Title>
-            <ReportProjects status={report.status} projects={report.projects} />
+            <ReportProjects
+              status={report.status}
+              projects={report.projects}
+              departmentId={report.department._id}
+            />
           </div>
           <Divider />
           <div style={{ padding: "20px 0" }}>
@@ -100,6 +105,7 @@ export const ReportDisplay: FC<{ report: Report }> = ({ report }) => {
             <ReportCertifications
               status={report.status}
               certifications={report.certifications}
+              departmentId={report.department._id}
             />
           </div>
           <Divider />
@@ -107,7 +113,11 @@ export const ReportDisplay: FC<{ report: Report }> = ({ report }) => {
             <Title headingLevel="h3" style={{ marginBottom: 10 }}>
               Additional Notes
             </Title>
-            <ReportNotes status={report.status} notes={report.notes} />
+            <ReportNotes
+              status={report.status}
+              notes={report.notes}
+              departmentId={report.department._id}
+            />
           </div>
         </SidebarContent>
       </Sidebar>
