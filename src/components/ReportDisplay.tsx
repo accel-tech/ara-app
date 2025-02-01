@@ -86,7 +86,12 @@ export const ReportDisplay: FC<{ report: Report }> = ({ report }) => {
             <Title headingLevel="h3" style={{ marginBottom: 10 }}>
               Cloud Metrics
             </Title>
-            <ReportMetrics status={report.status} metrics={report.metrics} />
+            <ReportMetrics
+              status={report.status}
+              metrics={report.metrics}
+              reportId={report._id}
+              departmentId={report.department._id}
+            />
           </div>
           <Divider />
           <div style={{ padding: "20px 0" }}>
