@@ -3,21 +3,25 @@ import { User } from "./user";
 
 export type RDProjectData = {
   completedTasks: Array<{
+    _id: string;
     text: string;
     dateAdded: Date;
     addedBy: Pick<User, "_id" | "name" | "email">;
   }>;
   upcomingTasks: Array<{
+    _id: string;
     text: string;
     dateAdded: Date;
     addedBy: Pick<User, "_id" | "name" | "email">;
   }>;
   particularChallenges: Array<{
+    _id: string;
     text: string;
     dateAdded: Date;
     addedBy: Pick<User, "_id" | "name" | "email">;
   }>;
   issuesOnStandby: Array<{
+    _id: string;
     text: string;
     dateAdded: Date;
     addedBy: Pick<User, "_id" | "name" | "email">;
@@ -49,6 +53,7 @@ interface RDReportData {
       RDProjectData
   >;
   notes: Array<{
+    _id: string;
     text: string;
     dateAdded: Date;
     addedBy: Pick<User, "_id" | "name" | "email">;
@@ -59,6 +64,7 @@ interface RDReportData {
   };
   certifications: {
     completed: Array<{
+      _id: string;
       title: string;
       author: { _id: string; name: string; email: string };
       dateCompleted: Date;
@@ -67,6 +73,7 @@ interface RDReportData {
       dateProjected?: Date;
     }>;
     projected: Array<{
+      _id: string;
       title: string;
       author: { _id: string; name: string; email: string };
       dateProjected: Date;

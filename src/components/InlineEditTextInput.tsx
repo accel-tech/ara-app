@@ -1,5 +1,11 @@
 import { Button, TextInput } from "@patternfly/react-core";
-import { CheckIcon, PenIcon, TimesIcon } from "@patternfly/react-icons";
+import {
+  CheckIcon,
+  MinusIcon,
+  PenIcon,
+  TimesIcon,
+  TrashIcon,
+} from "@patternfly/react-icons";
 import { FC, Fragment, useEffect, useState } from "react";
 
 export const InlineEditTextInput: FC<{
@@ -7,7 +13,16 @@ export const InlineEditTextInput: FC<{
   onSave: (newValue: string) => void;
   isDisabled?: boolean;
   isEditable?: boolean;
-}> = ({ actualValue, onSave, isDisabled, isEditable = true }) => {
+  isDeletable?: boolean;
+  onDelete?: () => void;
+}> = ({
+  actualValue,
+  onSave,
+  isDisabled,
+  isEditable = true,
+  isDeletable = false,
+  onDelete,
+}) => {
   const [value, setValue] = useState("");
   const [state, setState] = useState<"view" | "edit">("view");
 
@@ -49,6 +64,15 @@ export const InlineEditTextInput: FC<{
             size="sm"
             onClick={handleCancel}
           ></Button>
+          {isDeletable && (
+            <Button
+              size="sm"
+              variant="link"
+              icon={<TrashIcon />}
+              onClick={onDelete}
+              isDanger
+            />
+          )}
         </Fragment>
       )}
       {state === "view" && (
@@ -60,6 +84,7 @@ export const InlineEditTextInput: FC<{
               variant="plain"
               size="sm"
               onClick={() => setState("edit")}
+              isDisabled={isDisabled}
             ></Button>
           )}
         </Fragment>

@@ -14,7 +14,7 @@ import { InlineEditTextInput } from "./InlineEditTextInput";
 
 const keyInfoMap: Record<
   keyof Report["metrics"],
-  { label: string; info?: string }
+  { label: string; info?: string; unit?: string }
 > = {
   origins_cpu: { label: "Origins CPU usage", info: "" },
   origins_memory: { label: "Origins Memory usage", info: "" },

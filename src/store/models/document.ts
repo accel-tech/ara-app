@@ -2,6 +2,7 @@ import { Action, action } from "easy-peasy";
 import { concatWithoutDuplicates } from "../../utils/misc";
 
 export interface DocumentModel<T> {
+  key: number;
   isLoading: boolean;
   isInitialized: boolean;
   documents: Array<T>;
@@ -17,6 +18,7 @@ export interface DocumentModel<T> {
     }
   >;
   addDocuments: Action<DocumentModel<T>, Array<T>>;
+  patchDocument: Action<DocumentModel<T>, { _id: string; fields: Partial<T> }>;
   removeDocument: Action<DocumentModel<T>, string>;
   replaceDocument: Action<DocumentModel<T>, T>;
   setLoadingDocument: Action<
@@ -41,6 +43,7 @@ export function createDocumentModel<T extends { _id: string }>(
   initialDocuments?: T[]
 ): DocumentModel<T> {
   return {
+    key: 0,
     isLoading: true,
     isInitialized: false,
     documents: initialDocuments || [],
@@ -58,9 +61,20 @@ export function createDocumentModel<T extends { _id: string }>(
     }),
     addDocuments: action((state, payload) => {
       state.documents = state.documents.concat(payload); // concatWithoutDuplicates
+      state.key += 1;
+    }),
+    patchDocument: action((state, payload) => {
+      state.documents = state.documents.map((doc) => {
+        if (doc._id === payload._id) {
+          state.key += 1;
+          return { ...doc, ...payload.fields };
+        }
+        return doc;
+      });
     }),
     removeDocument: action((state, payload) => {
       state.documents = state.documents.filter((doc) => doc._id !== payload);
+      state.key += 1;
     }),
     replaceDocument: action((state, payload) => {
       state.documents = state.documents.map((doc) => {

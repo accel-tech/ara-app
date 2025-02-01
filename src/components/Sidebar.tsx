@@ -12,9 +12,6 @@ import { typedUseStoreState } from "../store";
 import { User } from "../types/user";
 import { capitalizeFirstLetter, departmentToUrl } from "../utils/misc";
 
-const defaultRoutes = [{ path: "/", label: "Home" }];
-const adminRoutes = [{ path: "/api", label: "API" }];
-
 type RouteGroup = { label: string; routes: { path: string; label: string }[] };
 
 export const Sidebar: FC<{ isSidebarOpen: boolean }> = ({ isSidebarOpen }) => {
@@ -56,7 +53,10 @@ export const Sidebar: FC<{ isSidebarOpen: boolean }> = ({ isSidebarOpen }) => {
 
 function getRoutes(user: User): RouteGroup[] {
   const groups: RouteGroup[] = [
-    { label: "General", routes: [{ label: "Home", path: "/" }] },
+    {
+      label: "General",
+      routes: [{ label: "Home", path: "/" }],
+    },
   ];
 
   if (user.role === "basic") {
@@ -70,6 +70,10 @@ function getRoutes(user: User): RouteGroup[] {
         path: departmentToUrl({ category, title }),
       });
     }
+  }
+
+  if (user.role === "admin") {
+    groups[0].routes.push({ label: "API", path: "/api" });
   }
   return groups;
 }

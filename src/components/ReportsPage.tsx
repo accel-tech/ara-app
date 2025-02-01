@@ -11,7 +11,7 @@ import {
   ToolbarGroup,
   ToolbarItem,
 } from "@patternfly/react-core";
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useMemo, useState } from "react";
 import { Dots } from "./Dots";
 import { dateToWeekRange, fmtDate1 } from "../utils/misc";
 import {
@@ -23,12 +23,18 @@ import { useFetch } from "../hooks/useFetch";
 import { useSearchParams } from "react-router-dom";
 import { ReportDisplay } from "./ReportDisplay";
 import { Report } from "../types/report";
+import { typedUseStoreActions, typedUseStoreState } from "../store";
 
 export const ReportsPage: FC<{ departmentId: string }> = ({ departmentId }) => {
   const [report, setReport] = useState<Report | null>(null);
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
+  const reports = typedUseStoreState((state) => state.reports.documents);
+  const reportsKey = typedUseStoreState((state) => state.reports.key);
+  const addDocuments = typedUseStoreActions(
+    (actions) => actions.reports.addDocuments
+  );
 
   // const [filters, setFilters] = useState<{ date: Date | null }>({
   //   date: new Date("2024-12-12"),
@@ -36,7 +42,7 @@ export const ReportsPage: FC<{ departmentId: string }> = ({ departmentId }) => {
 
   const httpRequest = useFetch();
 
-  async function fetchReport() {
+  async function fetchReports() {
     if (isLoading) return;
     setLoading(true);
     const query = [`departmentId=${departmentId}`];
@@ -48,13 +54,25 @@ export const ReportsPage: FC<{ departmentId: string }> = ({ departmentId }) => {
       console.log(error, "Failed to fetch report");
       setError(error.message);
     } else if (data && Object.keys(data).length > 0) {
-      setReport(data);
+      addDocuments([data]);
+    }
+  }
+
+  function findMatchingDocument() {
+    const report = reports.find((rep) => rep); // find matching;
+    if (report) {
+      setReport(report);
+      return;
+    } else {
+      fetchReports();
+      return;
     }
   }
 
   useEffect(() => {
-    if (!isLoading) fetchReport();
-  }, [searchParams.toString()]);
+    if (!isLoading) findMatchingDocument();
+  }, [searchParams.toString(), reportsKey]);
+
   function Body() {
     // loading skeleton
     if (isLoading) {

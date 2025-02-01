@@ -15,6 +15,8 @@ export default function BasicUserApp() {
     setSidebarOpen((currentVal) => !currentVal);
   }
 
+  console.log("rerenderd");
+
   return (
     <Fragment>
       <BrowserRouter>

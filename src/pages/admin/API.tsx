@@ -81,6 +81,13 @@ const presetGroups: {
       },
     ],
   },
+  {
+    title: "Reports",
+    presets: [
+      { label: "List Reports", route: "/reports", method: "GET" },
+      { label: "Get Reports", route: "/reports/:id", method: "GET" },
+    ],
+  },
 ];
 
 export default function API() {

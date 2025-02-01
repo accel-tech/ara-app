@@ -16,7 +16,9 @@ export const ReportCertifications: FC<{
       <div>
         {access !== "lead" &&
           certifications.completed.length + certifications.projected.length ===
-            0 && <p>No projects have been added by the department lead.</p>}
+            0 && (
+            <p>No certifications have been added by the department lead.</p>
+          )}
         {access === "lead" && (
           <Button variant="link" icon={<PlusIcon />}>
             Add Certification

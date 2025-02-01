@@ -22,7 +22,6 @@ import { ReportProjects } from "./ReportProjects";
 import { ReportCertifications } from "./ReportCertifications";
 import { ReportNotes } from "./ReportNotes";
 import { useDepartmentAccess } from "../hooks/useDepartmentAccess";
-import { PlusIcon } from "@patternfly/react-icons";
 
 export const ReportDisplay: FC<{ report: Report }> = ({ report }) => {
   const access = useDepartmentAccess(report.department._id);
@@ -39,7 +38,7 @@ export const ReportDisplay: FC<{ report: Report }> = ({ report }) => {
               <p style={{ fontWeight: 500, opacity: 0.5 }}>{report._id}</p>
             </ToolbarItem>
             <ToolbarItem>
-              <p style={{ opacity: 0.5 }}>
+              <p style={{ opacity: 0.5, color: "black" }}>
                 {fmtDate1(report.coveringDates.from)} to{" "}
                 {fmtDate1(report.coveringDates.to)}
               </p>
@@ -49,6 +48,9 @@ export const ReportDisplay: FC<{ report: Report }> = ({ report }) => {
             </ToolbarItem>
           </ToolbarGroup>
           <ToolbarGroup align={{ default: "alignEnd" }}>
+            {access === "member" && report.status === "draft" && (
+              <Fragment></Fragment>
+            )}
             {access === "lead" && report.status === "draft" && (
               <Fragment>
                 <ToolbarItem>
@@ -114,6 +116,7 @@ export const ReportDisplay: FC<{ report: Report }> = ({ report }) => {
               Additional Notes
             </Title>
             <ReportNotes
+              reportId={report._id}
               status={report.status}
               notes={report.notes}
               departmentId={report.department._id}
