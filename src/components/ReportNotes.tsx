@@ -6,6 +6,7 @@ import {
   Icon,
   List,
   ListItem,
+  Panel,
   TextInput,
 } from "@patternfly/react-core";
 import {
@@ -147,7 +148,7 @@ export const ReportNotes: FC<{
     return (
       <div>
         {notes.length > 0 && (
-          <ul>
+          <ul style={{ marginBottom: 10 }}>
             {notes.map((note) => (
               <li
                 key={note._id}
@@ -155,7 +156,6 @@ export const ReportNotes: FC<{
                   display: "flex",
                   alignItems: "center",
                   columnGap: 5,
-                  listStyle: "initial",
                 }}
               >
                 <InlineEditTextInput
@@ -170,7 +170,7 @@ export const ReportNotes: FC<{
           </ul>
         )}
         {blankFields && (
-          <Fragment>
+          <Panel variant="raised" style={{ padding: 10 }}>
             <div style={{ display: "flex", columnGap: 5 }}>
               <TextInput
                 value={blankFields.text}
@@ -202,7 +202,7 @@ export const ReportNotes: FC<{
                 <Alert variant="danger" isInline isPlain title={error} />{" "}
               </p>
             )}
-          </Fragment>
+          </Panel>
         )}
         {(access === "lead" || access === "member") && !blankFields && (
           <Button
