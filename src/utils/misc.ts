@@ -90,3 +90,39 @@ export function fmtDate1(date: Date, month?: "short" | "long") {
 
   return new Intl.DateTimeFormat("en-US", options).format(new Date(date)); // format to Jan. 29
 }
+
+export function fmtDate2(date: Date | string) {
+  return new Date(date).toISOString().split("T")[0];
+}
+// export function getDifferences(oldObj, newObj) {
+//   let diff = {};
+//   for (let key of [...new Set([...Object.keys(oldObj ?? {}), ...Object.keys(newObj ?? {})])]) {
+//     switch (typeof newObj?.[key]) {
+//       case "boolean":
+//       case "number":
+//       case "string":
+//         if (!lodash.isEqual(oldObj?.[key], newObj?.[key])) {
+//           diff[key] = newObj?.[key];
+//         }
+//         break;
+//       case "object":
+//         if (Array.isArray(newObj?.[key])) {
+//           if (!lodash.isEqual(oldObj?.[key], newObj?.[key])) diff[key] = newObj[key];
+//           break;
+//         }
+//         if (typeof newObj?.[key]?.getTime === "function") {
+//           if (newObj[key].getTime() !== oldObj?.[key]?.getTime?.()) diff[key] = newObj[key];
+//           break;
+//         }
+//         let subdiff = getDifferences(oldObj?.[key], newObj?.[key]);
+//         if (Object.keys(subdiff).length > 0) diff[key] = subdiff;
+//         break;
+//       default:
+//         console.log(`unandled type: ${typeof newObj?.[key]}`);
+//         if (oldObj?.[key]) diff[key] = undefined;
+//         break;
+//     }
+//   }
+
+//   return diff;
+// }

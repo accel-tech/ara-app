@@ -1,5 +1,5 @@
 import { Department } from "./department";
-import { RDCertification } from "./rd-certification";
+import { RDCertification } from "./certification";
 import { User } from "./user";
 
 export type RDProjectData = {

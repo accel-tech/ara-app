@@ -18,4 +18,4 @@ interface Completed extends GenericProps {
   dateProjected?: Date;
 }
 
-export type RDCertification = Projected | Completed;
+export type Certification = Projected | Completed;
