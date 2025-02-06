@@ -1,51 +1,7 @@
 import { Department } from "./department";
-import { RDCertification } from "./certification";
+import { Certification } from "./certification";
 import { User } from "./user";
-
-export type RDProjectData = {
-  completedTasks: Array<{
-    _id: string;
-    text: string;
-    dateAdded: Date;
-    addedBy: Pick<User, "_id" | "name" | "email">;
-  }>;
-  upcomingTasks: Array<{
-    _id: string;
-    text: string;
-    dateAdded: Date;
-    addedBy: Pick<User, "_id" | "name" | "email">;
-  }>;
-  particularChallenges: Array<{
-    _id: string;
-    text: string;
-    dateAdded: Date;
-    addedBy: Pick<User, "_id" | "name" | "email">;
-  }>;
-  issuesOnStandby: Array<{
-    _id: string;
-    text: string;
-    dateAdded: Date;
-    addedBy: Pick<User, "_id" | "name" | "email">;
-  }>;
-};
-
-interface RDProject {
-  _id: string;
-  title: string;
-  description: string;
-  dateCreated: Date;
-  isActive: boolean;
-  overseer: {
-    _id: string;
-    name: string;
-    email: string;
-  };
-  department: {
-    _id: string;
-    title: string;
-  };
-  dateClosed?: Date;
-}
+import { Project, ReportProject } from "./project";
 
 type RDNote = {
   _id: string;
@@ -56,16 +12,13 @@ type RDNote = {
 
 interface RDReportData {
   kind: "r&d";
-  projects: Array<
-    Pick<RDProject, "_id" | "title" | "description" | "overseer"> &
-      RDProjectData
-  >;
+  projects: Array<ReportProject>;
   notes: RDNote[];
   metrics: {
     origins_cpu: number;
     origins_memory: number;
   };
-  certifications: RDCertification[];
+  certifications: Certification[];
 }
 
 type ReportStatus =

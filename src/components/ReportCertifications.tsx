@@ -38,7 +38,7 @@ import { useDepartmentAccess } from "../hooks/useDepartmentAccess";
 import { EmployeeSelect } from "./EmployeeSelect";
 import { useFetch } from "../hooks/useFetch";
 import { Certification } from "../types/certification";
-import { typedUseStoreActions } from "../store";
+import { typedUseStoreActions, typedUseStoreState } from "../store";
 import { fmtDate1, fmtDate2 } from "../utils/misc";
 
 export const ReportCertifications: FC<{
@@ -50,6 +50,7 @@ export const ReportCertifications: FC<{
   const [newCertificationOpen, setNewCertificationOpen] = useState(false);
 
   const access = useDepartmentAccess(departmentId);
+  const userId = typedUseStoreState((state) => state.auth.user!._id);
 
   const patchDocument = typedUseStoreActions(
     (actions) => actions.reports.patchDocument
@@ -72,6 +73,7 @@ export const ReportCertifications: FC<{
     patchDocument({
       _id: reportId,
       fields: {
+        // @ts-ignore
         certifications: certifications.map((cert) => {
           if (cert._id === _id) {
             return { ...cert, ...fields };
@@ -113,7 +115,7 @@ export const ReportCertifications: FC<{
                   cert={cert}
                   onEdit={(changes) => onEditCertification(cert._id, changes)}
                   onRemove={() => onRemoveCertification(cert._id)}
-                  isEditable
+                  isEditable={access === "lead" || cert.employee._id === userId}
                 />
               ))}
             </List>
@@ -130,7 +132,9 @@ export const ReportCertifications: FC<{
                     key={cert._id}
                     onEdit={(changes) => onEditCertification(cert._id, changes)}
                     onRemove={() => onRemoveCertification(cert._id)}
-                    isEditable
+                    isEditable={
+                      access === "lead" || cert.employee._id === userId
+                    }
                   />
                 ))}
               </DataListItem>
@@ -181,7 +185,7 @@ function ProjectedCertificate({
   onRemove: () => void;
 }) {
   const [isEditing, setIsEditing] = useState(false);
-  console.log(cert);
+
   return (
     <DataListItemRow>
       <DataListItemCells
@@ -466,11 +470,7 @@ function NewCertificationForm({
             </GridItem>
           )}
         </Grid>
-        {error && (
-          <p style={{ color: "red" }}>
-            <Alert variant="danger" isInline isPlain title={error} />{" "}
-          </p>
-        )}
+        {error && <Alert variant="danger" isInline isPlain title={error} />}
         <div
           style={{
             display: "flex",
@@ -704,11 +704,7 @@ function EditCertification({
             </FormGroup>
           </GridItem>
         </Grid>
-        {error && (
-          <p style={{ color: "red" }}>
-            <Alert variant="danger" isInline isPlain title={error} />{" "}
-          </p>
-        )}
+        {error && <Alert variant="danger" isInline isPlain title={error} />}
         <div
           style={{
             display: "flex",

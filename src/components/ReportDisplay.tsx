@@ -101,6 +101,7 @@ export const ReportDisplay: FC<{ report: Report }> = ({ report }) => {
             <ReportProjects
               status={report.status}
               projects={report.projects}
+              reportId={report._id}
               departmentId={report.department._id}
             />
           </div>
