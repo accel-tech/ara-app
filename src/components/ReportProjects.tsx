@@ -4,18 +4,35 @@ import {
   ActionGroup,
   Alert,
   Button,
+  Content,
+  Divider,
   Form,
   FormGroup,
+  List,
+  ListItem,
   Panel,
   TextInput,
+  Title,
 } from "@patternfly/react-core";
-import { PlusIcon } from "@patternfly/react-icons";
+import {
+  CalendarAltIcon,
+  CheckCircleIcon,
+  CheckIcon,
+  CircleIcon,
+  PauseCircleIcon,
+  PlusIcon,
+  StopIconConfig,
+  WarningTriangleIcon,
+  WarningTriangleIconConfig,
+} from "@patternfly/react-icons";
 import { useDepartmentAccess } from "../hooks/useDepartmentAccess";
 import { ProjectSelect } from "./ProjectSelect";
 import { useFetch } from "../hooks/useFetch";
-import { Project, ReportProject } from "../types/project";
+import { Project, ProjectTask, ReportProject } from "../types/project";
 import { EmployeeSelect } from "./EmployeeSelect";
-import { typedUseStoreActions } from "../store";
+import { typedUseStoreActions, typedUseStoreState } from "../store";
+import { InlineEditTextInput } from "./InlineEditTextInput";
+import { capitalizeFirstLetter } from "../utils/misc";
 
 export const ReportProjects: FC<{
   status: Report["status"];
@@ -23,8 +40,10 @@ export const ReportProjects: FC<{
   departmentId: string;
   reportId: string;
 }> = ({ status, projects, departmentId, reportId }) => {
-  const access = useDepartmentAccess(departmentId);
   const [addIsOpen, setAddIsOpen] = useState(false);
+
+  const access = useDepartmentAccess(departmentId);
+  const userId = typedUseStoreState((state) => state.auth.user!._id);
 
   const patchDocument = typedUseStoreActions(
     (actions) => actions.reports.patchDocument
@@ -39,15 +58,54 @@ export const ReportProjects: FC<{
     });
   }
 
+  function onRemoveProject(projectId: string) {
+    patchDocument({
+      _id: reportId,
+      fields: {
+        projects: projects.filter((pro) => pro._id !== projectId),
+      },
+    });
+  }
+
+  function onEditProject(args: {
+    _id: string;
+    fields: Partial<ReportProject>;
+  }) {
+    patchDocument({
+      _id: reportId,
+      fields: {
+        projects: projects.map((pro) => {
+          if (pro._id === args._id) {
+            return { ...pro, ...args.fields };
+          }
+          return pro;
+        }),
+      },
+    });
+  }
+
   if (status === "draft") {
     return (
       <div>
         {access !== "lead" && projects.length === 0 && (
           <p>No projects have been added by the department lead.</p>
         )}
-        {projects.map((pro) => (
-          <p key={pro._id}>Project {pro.title}</p>
-        ))}
+        {projects.length > 0 && (
+          <div style={{ display: "flex", flexDirection: "column", rowGap: 10 }}>
+            {projects.map((pro) => (
+              <ProjectComponent
+                key={pro._id}
+                project={pro}
+                reportId={reportId}
+                isEditable={access === "lead" || pro.overseer._id === userId}
+                isLead={access === "lead"}
+                onEdit={(fields) => onEditProject({ _id: pro._id, fields })}
+                onRemove={() => onRemoveProject(pro._id)}
+              />
+            ))}
+          </div>
+        )}
+
         {access === "lead" && addIsOpen && (
           <AddProjectPanel
             departmentId={departmentId}
@@ -190,16 +248,19 @@ function AddProjectPanel({
   }
 
   return (
-    <Panel variant="raised" style={{ padding: 20 }}>
+    <Panel variant="raised" style={{ padding: 10, marginTop: 10 }}>
       <Form onSubmit={handleSubmit}>
         {!newProjectFields ? (
           <Fragment>
-            <FormGroup label="Create new Project">
-              <Button variant="link" onClick={toggleNewProject}>
-                Create Project
-              </Button>
-            </FormGroup>
-            <FormGroup>or</FormGroup>
+            <Button
+              variant="link"
+              onClick={toggleNewProject}
+              icon={<PlusIcon />}
+              style={{ marginTop: 10 }}
+            >
+              Create New Project
+            </Button>
+            <Divider />
             <FormGroup label="Select Existing Project">
               <ProjectSelect
                 departmentId={departmentId}
@@ -282,4 +343,351 @@ function AddProjectPanel({
       </Form>
     </Panel>
   );
+}
+
+function ProjectComponent({
+  project,
+  isEditable,
+  reportId,
+  onEdit,
+  onRemove,
+  isLead,
+}: {
+  reportId: string;
+  project: ReportProject;
+  isEditable: boolean;
+  isLead: boolean;
+  onEdit: (fields: Partial<ReportProject>) => void;
+  onRemove: () => void;
+}) {
+  const [newFields, setNewFields] = useState<null | {
+    text: string;
+    kind: string;
+  }>(null);
+  const [isLoading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const httpRequest = useFetch();
+
+  async function handleAddTask() {
+    if (isLoading || !newFields) return;
+    if (!newFields.text) {
+      setError("Content is required");
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    const { data, error } = await httpRequest<ProjectTask>("/tasks", {
+      method: "POST",
+      body: JSON.stringify({
+        text: newFields.text,
+        kind: newFields.kind,
+        reportId: reportId,
+        projectId: project._id,
+      }),
+    });
+    setLoading(true);
+    if (error) {
+      console.log(error, "Failed to add task");
+      setError(error.message);
+      return;
+    }
+
+    if (data && Object.keys(data).length > 0) {
+      onEdit({ tasks: [...project.tasks, data] });
+      setNewFields(null);
+    }
+  }
+
+  async function handleEditTask(args: { _id: string; text: string }) {
+    if (isLoading) return;
+    setLoading(true);
+    onEdit({
+      tasks: project.tasks.map((task) => ({
+        ...task,
+        text: task._id === args._id ? args.text : task.text,
+      })),
+    });
+    const { error } = await httpRequest(`/tasks/${args._id}`, {
+      method: "PATCH",
+      body: JSON.stringify({ text: args.text }),
+    });
+    setLoading(false);
+    if (error) {
+      console.log(error, "Failed to edit task");
+      setError(error.message);
+      onEdit({
+        tasks: project.tasks,
+      });
+      return;
+    }
+  }
+
+  async function handleDeleteTask(taskId: string) {
+    if (isLoading) return;
+    setLoading(true);
+    onEdit({
+      tasks: project.tasks.filter((task) => task._id !== taskId),
+    });
+    const { error } = await httpRequest(`/tasks/${taskId}`, {
+      method: "DELETE",
+    });
+    setLoading(false);
+    if (error) {
+      console.log(error, "Failed to delete task");
+      setError(error.message);
+      onEdit({
+        tasks: project.tasks,
+      });
+      return;
+    }
+  }
+
+  async function handleRemoveProject() {
+    if (isLoading) return;
+    setLoading(true);
+    const { data, error } = await httpRequest(
+      `/reports/${reportId}/projects/${project._id}`,
+      {
+        method: "DELETE",
+      }
+    );
+    setLoading(false);
+    if (error) {
+      console.log(error, "Failed to remove project");
+      setError(error.message);
+      return;
+    }
+    if (data) {
+      onRemove();
+    }
+  }
+
+  function toggleAddTask(kind: string) {
+    setNewFields({ text: newFields?.text || "", kind });
+  }
+
+  function cancelAddTask() {
+    setNewFields(null);
+    setError(null);
+  }
+
+  return (
+    <Panel
+      // variant=""
+      style={{
+        padding: 10,
+        border: "1px solid #d1d1d1",
+      }}
+    >
+      <div>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            margin: "5px 0",
+          }}
+        >
+          <Title headingLevel="h3">
+            {capitalizeFirstLetter(project.title)}
+          </Title>
+          {isLead && (
+            <div>
+              <Button
+                size="sm"
+                variant="link"
+                isDanger
+                onClick={handleRemoveProject}
+                isDisabled={isLoading}
+              >
+                Remove from Report
+              </Button>
+            </div>
+          )}
+        </div>
+        <Divider />
+        <div
+          style={{
+            marginTop: 5,
+            marginBottom: 10,
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          <div>
+            <span style={{ opacity: 0.6 }}>Objective:</span>{" "}
+            <span>{project.description}</span>
+          </div>
+          <div>
+            <span style={{ opacity: 0.6 }}>Overseer:</span>{" "}
+            <span>{project.overseer.name}</span>
+          </div>
+        </div>
+      </div>
+      {["completed", "upcoming", "challenge", "standby"].map((kind) => (
+        <div key={kind}>
+          <Divider style={{ marginTop: 10 }} />
+          <Title style={{ margin: "5px 0", fontSize: 13 }} headingLevel="h6">
+            {/* {getIcon(kind)}  */}
+            {getTitle(kind)}
+          </Title>
+          <Divider style={{ marginBottom: 5 }} />
+          {project.tasks.filter((task) => task.kind === kind).length > 0 ? (
+            // <ul style={{ marginBottom: 10 }}>
+            //   {project.tasks
+            //     .filter((task) => task.kind === kind)
+            //     .map((task) => (
+            //       <li key={task._id}>
+            //         <InlineEditTextInput
+            //           actualValue={task.text}
+            //           onSave={(text) => handleEditTask({ _id: task._id, text })}
+            //           onDelete={() => handleDeleteTask(task._id)}
+            //           isDisabled={!isEditable}
+            //           isDeletable
+            //         />
+            //       </li>
+            //     ))}
+            // </ul>
+            <List
+              style={{ marginBottom: 10, paddingLeft: 0, gap: 0 }}
+              className="customized-list"
+            >
+              {project.tasks
+                .filter((task) => task.kind === kind)
+                .map((task) => (
+                  <ListItem
+                    key={task._id}
+                    icon={getListIcon(kind)}
+                    style={{ display: "flex", alignItems: "center" }}
+                  >
+                    <InlineEditTextInput
+                      actualValue={task.text}
+                      onSave={(text) => handleEditTask({ _id: task._id, text })}
+                      onDelete={() => handleDeleteTask(task._id)}
+                      isDisabled={!isEditable}
+                      isDeletable
+                    />
+                  </ListItem>
+                ))}
+            </List>
+          ) : (
+            <p style={{ opacity: 0.5, fontSize: 10 }}>No tasks</p>
+          )}
+          {!!newFields && newFields.kind === kind ? (
+            <NewTask
+              fields={newFields}
+              setFields={setNewFields}
+              isLoading={isLoading}
+              error={error}
+              handleAdd={handleAddTask}
+              handleCancel={cancelAddTask}
+            />
+          ) : (
+            isEditable && (
+              <Button
+                size="sm"
+                variant="link"
+                icon={<PlusIcon />}
+                onClick={() => toggleAddTask(kind)}
+              />
+            )
+          )}
+        </div>
+      ))}
+    </Panel>
+  );
+}
+
+function NewTask({
+  fields,
+  setFields,
+  error,
+  isLoading,
+  handleAdd,
+  handleCancel,
+}: {
+  fields: { text: string; kind: string };
+  setFields: (fields: { text: string; kind: string }) => void;
+  error: string | null;
+  isLoading: boolean;
+  handleAdd: () => void;
+  handleCancel: () => void;
+}) {
+  return (
+    <Panel variant="secondary" style={{ padding: 10 }}>
+      <div style={{ display: "flex", columnGap: 5 }}>
+        <TextInput
+          value={fields.text}
+          onChange={(_e, text) => setFields({ ...fields, text })}
+          isDisabled={isLoading}
+          autoFocus
+        />
+        <Button variant="link" onClick={handleAdd} isDisabled={isLoading}>
+          Save
+        </Button>
+        <Button
+          variant="link"
+          isDanger
+          onClick={handleCancel}
+          isDisabled={isLoading}
+        >
+          Cancel
+        </Button>
+      </div>
+      {error && (
+        <Alert
+          variant="danger"
+          isInline
+          isPlain
+          title={error}
+          style={{ marginTop: 5 }}
+        />
+      )}
+    </Panel>
+  );
+}
+function getTitle(kind: string) {
+  switch (kind) {
+    case "completed":
+      return "Tasks Completed";
+    case "upcoming":
+      return "Tasks Upcoming";
+    case "challenge":
+      return "Particular Challenges";
+    case "standby":
+      return "Activities on Standby";
+    default:
+      return "Tasks";
+  }
+}
+
+function getIcon(kind: string) {
+  switch (kind) {
+    case "completed":
+      return <CheckCircleIcon style={{ color: "green" }} />;
+    case "upcoming":
+      return <CalendarAltIcon style={{ color: "orange" }} />;
+    case "challenge":
+      return <WarningTriangleIcon style={{ color: "red" }} />;
+    case "standby":
+      return <PauseCircleIcon />;
+    default:
+      return <CircleIcon />;
+  }
+}
+
+function getListIcon(kind: string) {
+  switch (kind) {
+    case "completed":
+      return <CheckIcon style={{ color: "green" }} />;
+    case "upcoming":
+      return <CalendarAltIcon style={{ color: "orange" }} />;
+    case "challenge":
+      return <WarningTriangleIcon style={{ color: "red" }} />;
+    case "standby":
+      return <PauseCircleIcon style={{ color: "red" }} />;
+    default:
+      return <CircleIcon />;
+  }
 }

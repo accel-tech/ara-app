@@ -1,1 +1,8 @@
 /* @import "tailwindcss"; */
+.customized-list .pf-v6-c-list__item-text {
+  flex: 1;
+}
+
+.customized-list .pf-v6-c-list__item-icon {
+  margin-top: 0px;
+}

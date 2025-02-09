@@ -18,15 +18,17 @@ export interface Project {
   dateClosed?: Date;
 }
 
+export type ProjectTask = {
+  _id: string;
+  text: string;
+  dateAdded: Date;
+  addedBy: Pick<User, "_id" | "name" | "email">;
+  kind: "upcoming" | "completed" | "challenge" | "standby";
+};
+
 export type ReportProject = Pick<
   Project,
   "_id" | "title" | "description" | "overseer"
 > & {
-  tasks: Array<{
-    _id: string;
-    text: string;
-    dateAdded: Date;
-    addedBy: Pick<User, "_id" | "name" | "email">;
-    kind: "upcoming" | "completed" | "challenge" | "standby";
-  }>;
+  tasks: Array<ProjectTask>;
 };

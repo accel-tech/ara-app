@@ -3,6 +3,7 @@ import {
   Divider,
   JumpLinks,
   JumpLinksItem,
+  JumpLinksList,
   Label,
   PageSection,
   Sidebar,
@@ -16,7 +17,7 @@ import {
 } from "@patternfly/react-core";
 import { FC, Fragment } from "react";
 import { Report } from "../types/report";
-import { fmtDate1 } from "../utils/misc";
+import { capitalizeFirstLetter, fmtDate1, urlizeString } from "../utils/misc";
 import { ReportMetrics } from "./ReportMetrics";
 import { ReportProjects } from "./ReportProjects";
 import { ReportCertifications } from "./ReportCertifications";
@@ -68,7 +69,7 @@ export const ReportDisplay: FC<{ report: Report }> = ({ report }) => {
         <SidebarPanel variant="sticky" hasNoBackground>
           <JumpLinks
             isVertical
-            scrollableSelector="#page-element"
+            scrollableSelector="#scrollable-element"
             offset={800}
             isExpanded
           >
@@ -76,12 +77,24 @@ export const ReportDisplay: FC<{ report: Report }> = ({ report }) => {
             <JumpLinksItem href="#projects">
               Projects
               {/* // if legnth loop through projects */}
+              {report.projects.length > 0 && (
+                <JumpLinksList>
+                  {report.projects.map((pro) => (
+                    <JumpLinksItem
+                      key={pro._id}
+                      href={`#${urlizeString(pro.title)}`}
+                    >
+                      {capitalizeFirstLetter(pro.title)}
+                    </JumpLinksItem>
+                  ))}
+                </JumpLinksList>
+              )}
             </JumpLinksItem>
             <JumpLinksItem href="#certifications">Certifications</JumpLinksItem>
             <JumpLinksItem href="#notes">Additional Notes</JumpLinksItem>
           </JumpLinks>
         </SidebarPanel>
-        <SidebarContent hasNoBackground hasPadding>
+        <SidebarContent hasNoBackground hasPadding id="scrollable-element">
           <div style={{ padding: "20px 0" }}>
             <Title headingLevel="h3" style={{ marginBottom: 10 }}>
               Cloud Metrics

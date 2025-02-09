@@ -230,11 +230,12 @@ function ProjectedCertificate({
         id="clickable-action-action1"
         aria-label="Actions"
       >
-        {isEditable && !isEditing && (
+        {!isEditing && (
           <Button
             variant="plain"
             icon={<PenIcon />}
             isInline
+            isDisabled={!isEditable}
             size="sm"
             onClick={() => setIsEditing(true)}
           />

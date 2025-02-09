@@ -15,6 +15,7 @@ export const InlineEditTextInput: FC<{
   isEditable?: boolean;
   isDeletable?: boolean;
   onDelete?: () => void;
+  styled?: boolean;
 }> = ({
   actualValue,
   onSave,
@@ -22,6 +23,7 @@ export const InlineEditTextInput: FC<{
   isEditable = true,
   isDeletable = false,
   onDelete,
+  styled = true,
 }) => {
   const [value, setValue] = useState("");
   const [state, setState] = useState<"view" | "edit">("view");
@@ -44,29 +46,42 @@ export const InlineEditTextInput: FC<{
     <div
       style={{
         position: "relative",
-        display: "flex",
-        width: "max-content",
+        display: styled ? "flex" : "inline-flex",
+        width: styled ? undefined : "max-content",
         alignItems: "center",
+        flex: 1,
       }}
     >
       {state === "edit" && (
         <Fragment>
-          <input value={value} onChange={(e) => setValue(e.target.value)} />
+          {styled ? (
+            <TextInput
+              value={value}
+              onChange={(_e, value) => setValue(value)}
+              autoFocus
+            />
+          ) : (
+            <input
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+              autoFocus
+            />
+          )}
           <Button
             icon={<CheckIcon />}
             variant="plain"
-            size="sm"
+            size={styled ? "default" : "sm"}
             onClick={handleSave}
           ></Button>
           <Button
             icon={<TimesIcon />}
             variant="plain"
-            size="sm"
+            size={styled ? "default" : "sm"}
             onClick={handleCancel}
           ></Button>
           {isDeletable && (
             <Button
-              size="sm"
+              size={styled ? "default" : "sm"}
               variant="link"
               icon={<TrashIcon />}
               onClick={onDelete}

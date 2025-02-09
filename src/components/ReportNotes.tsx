@@ -18,7 +18,6 @@ import {
 import { useDepartmentAccess } from "../hooks/useDepartmentAccess";
 import { useFetch } from "../hooks/useFetch";
 import { typedUseStoreActions, typedUseStoreState } from "../store";
-import { useToast } from "./ToolsWrapper";
 import { InlineEditTextInput } from "./InlineEditTextInput";
 
 export const ReportNotes: FC<{
@@ -152,11 +151,11 @@ export const ReportNotes: FC<{
             {notes.map((note) => (
               <li
                 key={note._id}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  columnGap: 5,
-                }}
+                // style={{
+                //   display: "flex",
+                //   alignItems: "center",
+                //   columnGap: 5,
+                // }}
               >
                 <InlineEditTextInput
                   actualValue={note.text}
@@ -170,13 +169,14 @@ export const ReportNotes: FC<{
           </ul>
         )}
         {blankFields && (
-          <Panel variant="raised" style={{ padding: 10 }}>
+          <Panel variant={undefined} style={{ padding: 10 }}>
             <div style={{ display: "flex", columnGap: 5 }}>
               <TextInput
                 value={blankFields.text}
                 onChange={(_e, text) =>
                   setBlankFields({ ...blankFields, text })
                 }
+                placeholder="Enter note"
                 isDisabled={isLoading}
                 autoFocus
               />
