@@ -14,6 +14,7 @@ import {
   DataListItemCells,
   DataListItemRow,
   DatePicker,
+  Divider,
   Form,
   FormGroup,
   Grid,
@@ -40,6 +41,7 @@ import { useFetch } from "../hooks/useFetch";
 import { Certification } from "../types/certification";
 import { typedUseStoreActions, typedUseStoreState } from "../store";
 import { fmtDate1, fmtDate2 } from "../utils/misc";
+import { CertificationSelect } from "./CertificationSelect";
 
 export const ReportCertifications: FC<{
   reportId: string;
@@ -100,85 +102,83 @@ export const ReportCertifications: FC<{
     (cert) => cert.status === "completed"
   );
 
-  if (status === "draft") {
-    return (
-      <div>
-        {access !== "lead" && certifications.length === 0 && (
+  return (
+    <div>
+      {status === "draft" &&
+        access !== "lead" &&
+        certifications.length === 0 && (
           <p>No certifications have been added by the department lead.</p>
         )}
-        {completedCerts.length > 0 && (
-          <div style={{ marginBottom: 15 }}>
-            <List isPlain>
-              {completedCerts.map((cert) => (
-                <CompletedCertificate
-                  key={cert._id}
+      {completedCerts.length > 0 && (
+        <div style={{ marginBottom: 15 }}>
+          <List isPlain>
+            {completedCerts.map((cert) => (
+              <CompletedCertificate
+                reportId={reportId}
+                key={cert._id}
+                cert={cert}
+                onEdit={(changes) => onEditCertification(cert._id, changes)}
+                onRemove={() => onRemoveCertification(cert._id)}
+                isEditable={
+                  status === "draft" &&
+                  (access === "lead" || cert.employee._id === userId)
+                }
+              />
+            ))}
+          </List>
+        </div>
+      )}
+      {projectedCerts.length > 0 && (
+        <div style={{ marginBottom: 15 }}>
+          <Content style={{ marginBottom: 5 }}>Upcoming:</Content>
+          <DataList aria-label="upcoming-certifications" isCompact>
+            <DataListItem style={{ background: "transparent" }}>
+              {projectedCerts.map((cert) => (
+                <ProjectedCertificate
+                  reportId={reportId}
                   cert={cert}
+                  key={cert._id}
                   onEdit={(changes) => onEditCertification(cert._id, changes)}
                   onRemove={() => onRemoveCertification(cert._id)}
-                  isEditable={access === "lead" || cert.employee._id === userId}
+                  isEditable={
+                    status === "draft" &&
+                    (access === "lead" || cert.employee._id === userId)
+                  }
                 />
               ))}
-            </List>
-          </div>
-        )}
-        {projectedCerts.length > 0 && (
-          <div style={{ marginBottom: 15 }}>
-            <Content style={{ marginBottom: 5 }}>Upcoming:</Content>
-            <DataList aria-label="upcoming-certifications" isCompact>
-              <DataListItem style={{ background: "transparent" }}>
-                {projectedCerts.map((cert) => (
-                  <ProjectedCertificate
-                    cert={cert}
-                    key={cert._id}
-                    onEdit={(changes) => onEditCertification(cert._id, changes)}
-                    onRemove={() => onRemoveCertification(cert._id)}
-                    isEditable={
-                      access === "lead" || cert.employee._id === userId
-                    }
-                  />
-                ))}
-              </DataListItem>
-            </DataList>
-          </div>
-        )}
+            </DataListItem>
+          </DataList>
+        </div>
+      )}
 
-        {newCertificationOpen && (
-          <NewCertificationForm
-            departmentId={departmentId}
-            onAdd={onNewCertification}
-            onClose={() => setNewCertificationOpen(false)}
-          />
+      {status === "draft" && newCertificationOpen && (
+        <AddCertificationPanel
+          reportId={reportId}
+          departmentId={departmentId}
+          onAdd={onNewCertification}
+          onClose={() => setNewCertificationOpen(false)}
+        />
+      )}
+
+      {status === "draft" &&
+        (access === "lead" || access === "member") &&
+        !newCertificationOpen && (
+          <Button variant="link" icon={<PlusIcon />} onClick={toggleAdd}>
+            Add Certification
+          </Button>
         )}
-
-        {(access === "lead" || access === "member") &&
-          !newCertificationOpen && (
-            <Button variant="link" icon={<PlusIcon />} onClick={toggleAdd}>
-              Add Certification
-            </Button>
-          )}
-      </div>
-    );
-  }
-
-  if (status === "published") {
-    return (
-      <div>
-        {certifications.length === 0 && (
-          <p>No certifications have been added by the department lead.</p>
-        )}
-      </div>
-    );
-  }
-
-  return <></>;
+    </div>
+  );
 };
 
 function ProjectedCertificate({
   cert,
+  reportId,
   isEditable,
   onEdit,
   onRemove,
 }: {
+  reportId: string;
   cert: Certification & { status: "projected" };
   isEditable: boolean;
   onEdit: (fields: Partial<Certification>) => void;
@@ -216,6 +216,7 @@ function ProjectedCertificate({
             : [
                 <DataListCell key="edit" isFilled={true}>
                   <EditCertification
+                    reportId={reportId}
                     cert={cert}
                     onCancel={() => setIsEditing(false)}
                     onEdit={onEdit}
@@ -235,7 +236,7 @@ function ProjectedCertificate({
             variant="plain"
             icon={<PenIcon />}
             isInline
-            isDisabled={!isEditable}
+            style={{ visibility: !isEditable ? "hidden" : undefined }}
             size="sm"
             onClick={() => setIsEditing(true)}
           />
@@ -250,11 +251,13 @@ function CompletedCertificate({
   isEditable,
   onEdit,
   onRemove,
+  reportId,
 }: {
   cert: Certification & { status: "completed" };
   isEditable: boolean;
   onEdit: (fields: Partial<Certification>) => void;
   onRemove: () => void;
+  reportId: string;
 }) {
   const [isEditing, setIsEditing] = useState(false);
   return (
@@ -283,6 +286,7 @@ function CompletedCertificate({
         </Content>
       ) : (
         <EditCertification
+          reportId={reportId}
           cert={cert}
           onCancel={() => setIsEditing(false)}
           onEdit={onEdit}
@@ -290,6 +294,298 @@ function CompletedCertificate({
         />
       )}
     </ListItem>
+  );
+}
+
+function AddCertificationPanel({
+  departmentId,
+  reportId,
+  onClose,
+  onAdd,
+}: {
+  departmentId: string;
+  reportId: string;
+  onClose: () => void;
+  onAdd: (newCert: Certification) => void;
+}) {
+  const [fields, setFields] = useState({ certificationId: "" });
+
+  const [blankFields, setBlankFields] = useState<null | {
+    title: string;
+    examCode: string;
+    examLink: string;
+    status: string;
+    statusDate: string;
+    employeeId?: string;
+  }>(null);
+  const [error, setError] = useState<null | string>(null);
+  const [isLoading, setLoading] = useState(false);
+  const httpRequest = useFetch();
+
+  const access = useDepartmentAccess(departmentId);
+
+  async function handleSubmitExisting() {
+    if (isLoading) return;
+    if (!fields.certificationId) {
+      setError("You must select a 'Certification'");
+      return;
+    }
+    setError(null);
+    setLoading(true);
+    const { data, error } = await httpRequest<Certification>(
+      `/reports/${reportId}/certifications`,
+      {
+        method: "POST",
+        body: JSON.stringify(fields),
+      }
+    );
+    setLoading(false);
+    if (error) {
+      console.log(error, "Failed to add certification to report");
+      setError(error.message);
+      return;
+    }
+    if (data && Object.keys(data).length > 0) {
+      onAdd(data);
+    }
+  }
+
+  async function handleSubmitNew() {
+    if (isLoading || !blankFields) return;
+    setLoading(true);
+    setError(null);
+
+    const { data, error } = await httpRequest<Certification>(
+      `/certifications`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          title: blankFields.title,
+          examCode: blankFields.examCode,
+          examLink: blankFields.examLink,
+          status: blankFields.status,
+          employeeId: blankFields.employeeId,
+          departmentId: departmentId,
+          [blankFields.status === "projected"
+            ? "dateProjected"
+            : "dateCompleted"]: blankFields.statusDate,
+        }),
+      }
+    );
+    setLoading(false);
+    if (error) {
+      console.log(error, "Failed to create certification");
+      setError(error.message);
+      return;
+    }
+
+    if (data && Object.keys(data).length > 0) {
+      onClose();
+      onAdd(data);
+    }
+  }
+
+  function handleSubmit(e: any) {
+    e.preventDefault();
+    if (!blankFields) return handleSubmitExisting();
+    else return handleSubmitNew();
+  }
+
+  function toggleBlankFields() {
+    setBlankFields({
+      title: "",
+      examCode: "",
+      examLink: "",
+      status: "projected",
+      statusDate: "",
+    });
+    setFields({ certificationId: "" });
+  }
+
+  function handleCancel() {
+    if (blankFields) {
+      setBlankFields(null);
+    } else {
+      onClose();
+    }
+  }
+
+  return (
+    <Panel variant="raised" style={{ padding: 20, marginTop: 10 }}>
+      <Form onSubmit={handleSubmit}>
+        {!blankFields ? (
+          <Fragment>
+            <Button
+              variant="link"
+              onClick={toggleBlankFields}
+              icon={<PlusIcon />}
+              style={{ marginTop: 10 }}
+            >
+              Add Brand New Certification
+            </Button>
+            <Divider />
+            <FormGroup label="Select Existing Certification">
+              <CertificationSelect
+                departmentId={departmentId}
+                value={fields.certificationId}
+                onValueChange={(certificationId) =>
+                  setFields({ ...fields, certificationId })
+                }
+                isDisabled={isLoading}
+              />
+            </FormGroup>
+          </Fragment>
+        ) : (
+          <Fragment>
+            <Grid hasGutter md={6}>
+              <GridItem span={12}>
+                <FormGroup label="Title">
+                  <TextInput
+                    aria-label="title"
+                    value={blankFields.title}
+                    onChange={(_e, title) =>
+                      setBlankFields({ ...blankFields, title })
+                    }
+                    placeholder="Ex: Red Hat Certified System Administrator"
+                    isDisabled={isLoading}
+                  />
+                </FormGroup>
+              </GridItem>
+              <GridItem span={3}>
+                <FormGroup label="Exam Code">
+                  <TextInput
+                    aria-label="exam-code"
+                    value={blankFields.examCode}
+                    onChange={(_e, examCode) =>
+                      setBlankFields({ ...blankFields, examCode })
+                    }
+                    placeholder="Ex: EX200"
+                    isDisabled={isLoading}
+                  />
+                </FormGroup>
+              </GridItem>
+              <GridItem span={9}>
+                <FormGroup label="Exam Link">
+                  <TextInput
+                    aria-label="exam-link"
+                    value={blankFields.examLink}
+                    onChange={(_e, examLink) =>
+                      setBlankFields({ ...blankFields, examLink })
+                    }
+                    placeholder="Ex: https://www.redhat.com/en/services/certification/rhcsa"
+                    isDisabled={isLoading}
+                  />
+                </FormGroup>
+              </GridItem>
+              <GridItem span={3}>
+                <FormGroup label="Status">
+                  <Radio
+                    name="status"
+                    label={
+                      <>
+                        Projected{" "}
+                        <CalendarAltIcon style={{ color: "orange" }} />
+                      </>
+                    }
+                    id="status-01"
+                    checked={blankFields.status === "projected"}
+                    onChange={(_e, checked) =>
+                      setBlankFields({
+                        ...blankFields,
+                        status: checked ? "projected" : "completed",
+                        statusDate: "",
+                      })
+                    }
+                    isDisabled={isLoading}
+                  />
+                  <Radio
+                    name="status"
+                    label={
+                      <>
+                        Completed <CheckCircleIcon style={{ color: "green" }} />
+                      </>
+                    }
+                    id="status-02"
+                    checked={blankFields.status === "completed"}
+                    onChange={(_e, checked) =>
+                      setBlankFields({
+                        ...blankFields,
+                        status: checked ? "completed" : "projected",
+                        statusDate: "",
+                      })
+                    }
+                    isDisabled={isLoading}
+                  />
+                </FormGroup>
+              </GridItem>
+              <GridItem>
+                <FormGroup
+                  label={
+                    blankFields.status === "projected"
+                      ? "Date Projected"
+                      : "Date Completed"
+                  }
+                >
+                  <DatePicker
+                    value={blankFields.statusDate}
+                    onChange={(_event, statusDate) =>
+                      setBlankFields({ ...blankFields, statusDate })
+                    }
+                    isDisabled={isLoading}
+                  />
+                </FormGroup>
+              </GridItem>
+              {access === "lead" && (
+                <GridItem span={4}>
+                  <FormGroup label="Employee">
+                    <EmployeeSelect
+                      value={blankFields.employeeId || ""}
+                      onValueChange={(employeeId) =>
+                        setBlankFields({ ...blankFields, employeeId })
+                      }
+                      isDisabled={isLoading}
+                      departmentId={departmentId}
+                    />
+                  </FormGroup>
+                </GridItem>
+              )}
+            </Grid>
+            {error && <Alert variant="danger" isInline isPlain title={error} />}
+          </Fragment>
+        )}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-start",
+            alignItems: "center",
+            gap: 10,
+          }}
+        >
+          {(fields.certificationId || !!blankFields) && (
+            <Button
+              isLoading={isLoading}
+              isDisabled={isLoading}
+              onClick={handleSubmit}
+              // icon={<PlusIcon />}
+              variant="stateful"
+            >
+              {!!blankFields
+                ? "Create New Certification"
+                : "Add Existing Certification"}
+            </Button>
+          )}
+
+          <Button
+            variant="link"
+            isDanger
+            onClick={handleCancel}
+            isDisabled={isLoading}
+          >
+            Cancel
+          </Button>
+        </div>
+      </Form>
+    </Panel>
   );
 }
 
@@ -497,11 +793,13 @@ function NewCertificationForm({
 }
 
 function EditCertification({
+  reportId,
   cert,
   onEdit,
   onRemove,
   onCancel,
 }: {
+  reportId: string;
   cert: Certification;
   onEdit: (fields: Partial<Certification>) => void;
   onRemove: () => void;
@@ -574,14 +872,16 @@ function EditCertification({
     }
   }
 
-  async function handleRemove() {
+  async function handleRemove(reportOnly?: boolean) {
     if (isLoading) return;
     setLoading(true);
     setError(null);
-    const { data, error } = await httpRequest<Partial<Certification>>(
-      `/certifications/${cert._id}`,
-      { method: "DELETE" }
-    );
+    const url = reportOnly
+      ? `/reports/${reportId}/certifications/${cert._id}`
+      : `/certifications/${cert._id}`;
+    const { data, error } = await httpRequest<Partial<Certification>>(url, {
+      method: "DELETE",
+    });
     setLoading(false);
     if (error) {
       console.log(error, "failed to delete certification");
@@ -726,12 +1026,20 @@ function EditCertification({
           </Button>
           <Button
             variant="link"
-            onClick={handleRemove}
+            onClick={() => handleRemove(true)}
+            isDisabled={isLoading}
+            isDanger
+          >
+            Remove from Report
+          </Button>
+          {/* <Button
+            variant="link"
+            onClick={() => handleRemove()}
             isDisabled={isLoading}
             isDanger
           >
             Delete
-          </Button>
+          </Button> */}
         </div>
       </Form>
     </Panel>

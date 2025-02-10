@@ -34,6 +34,11 @@ export function concatWithoutDuplicates<T extends { _id: string }>(
 export function capitalizeFirstLetter(val: string) {
   return String(val).charAt(0).toUpperCase() + String(val).slice(1);
 }
+export function capitalizeAllWords(val: string) {
+  return val
+    .split(" ")
+    .reduce((final, curr) => final + " " + capitalizeFirstLetter(curr), "");
+}
 
 export function departmentToUrl(props: { category: string; title: string }) {
   return (

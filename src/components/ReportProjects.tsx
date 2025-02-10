@@ -32,7 +32,7 @@ import { Project, ProjectTask, ReportProject } from "../types/project";
 import { EmployeeSelect } from "./EmployeeSelect";
 import { typedUseStoreActions, typedUseStoreState } from "../store";
 import { InlineEditTextInput } from "./InlineEditTextInput";
-import { capitalizeFirstLetter } from "../utils/misc";
+import { capitalizeAllWords, capitalizeFirstLetter } from "../utils/misc";
 
 export const ReportProjects: FC<{
   status: Report["status"];
@@ -84,58 +84,60 @@ export const ReportProjects: FC<{
     });
   }
 
-  if (status === "draft") {
-    return (
-      <div>
-        {access !== "lead" && projects.length === 0 && (
-          <p>No projects have been added by the department lead.</p>
-        )}
-        {projects.length > 0 && (
-          <div style={{ display: "flex", flexDirection: "column", rowGap: 10 }}>
-            {projects.map((pro) => (
-              <ProjectComponent
-                key={pro._id}
-                project={pro}
-                reportId={reportId}
-                isEditable={access === "lead" || pro.overseer._id === userId}
-                isLead={access === "lead"}
-                onEdit={(fields) => onEditProject({ _id: pro._id, fields })}
-                onRemove={() => onRemoveProject(pro._id)}
-              />
-            ))}
-          </div>
-        )}
+  return (
+    <div>
+      {projects.length === 0 && (
+        <p
+          style={{
+            opacity: 0.5,
+            fontSize: 11,
+            display:
+              access === "lead" && status === "draft" ? "none" : undefined,
+          }}
+        >
+          No project
+        </p>
+      )}
 
-        {access === "lead" && addIsOpen && (
-          <AddProjectPanel
-            departmentId={departmentId}
-            reportId={reportId}
-            onCancel={() => setAddIsOpen(false)}
-            onAdd={onNewProject}
-          />
-        )}
-        {access === "lead" && !addIsOpen && (
-          <Button
-            variant="link"
-            icon={<PlusIcon />}
-            onClick={() => setAddIsOpen(true)}
-          >
-            Add Project
-          </Button>
-        )}
-      </div>
-    );
-  }
+      {projects.length > 0 && (
+        <div style={{ display: "flex", flexDirection: "column", rowGap: 10 }}>
+          {projects.map((pro) => (
+            <ProjectComponent
+              key={pro._id}
+              project={pro}
+              reportId={reportId}
+              isEditable={
+                status === "draft" &&
+                (access === "lead" || pro.overseer._id === userId)
+              }
+              isLead={status === "draft" && access === "lead"}
+              onEdit={(fields) => onEditProject({ _id: pro._id, fields })}
+              onRemove={() => onRemoveProject(pro._id)}
+            />
+          ))}
+        </div>
+      )}
 
-  if (status === "published") {
-    return (
-      <div>
-        <p>form to update</p>
-      </div>
-    );
-  }
+      {status === "draft" && access === "lead" && addIsOpen && (
+        <AddProjectPanel
+          departmentId={departmentId}
+          reportId={reportId}
+          onCancel={() => setAddIsOpen(false)}
+          onAdd={onNewProject}
+        />
+      )}
 
-  return <></>;
+      {status === "draft" && access === "lead" && !addIsOpen && (
+        <Button
+          variant="link"
+          icon={<PlusIcon />}
+          onClick={() => setAddIsOpen(true)}
+        >
+          Add Project
+        </Button>
+      )}
+    </div>
+  );
 };
 
 function AddProjectPanel({
@@ -322,6 +324,7 @@ function AddProjectPanel({
               isDisabled={isLoading}
               onClick={handleSubmit}
               // icon={<PlusIcon />}
+              variant="stateful"
             >
               {!!newProjectFields
                 ? "Create New Project"
@@ -501,7 +504,7 @@ function ProjectComponent({
                 onClick={handleRemoveProject}
                 isDisabled={isLoading}
               >
-                Remove from Report
+                Remove Project from Report
               </Button>
             </div>
           )}
@@ -521,7 +524,7 @@ function ProjectComponent({
           </div>
           <div>
             <span style={{ opacity: 0.6 }}>Overseer:</span>{" "}
-            <span>{project.overseer.name}</span>
+            <span>{capitalizeAllWords(project.overseer.name)}</span>
           </div>
         </div>
       </div>
@@ -561,18 +564,31 @@ function ProjectComponent({
                     icon={getListIcon(kind)}
                     style={{ display: "flex", alignItems: "center" }}
                   >
-                    <InlineEditTextInput
-                      actualValue={task.text}
-                      onSave={(text) => handleEditTask({ _id: task._id, text })}
-                      onDelete={() => handleDeleteTask(task._id)}
-                      isDisabled={!isEditable}
-                      isDeletable
-                    />
+                    {isEditable ? (
+                      <InlineEditTextInput
+                        actualValue={task.text}
+                        onSave={(text) =>
+                          handleEditTask({ _id: task._id, text })
+                        }
+                        onDelete={() => handleDeleteTask(task._id)}
+                        isDeletable
+                      />
+                    ) : (
+                      <p>{task.text}</p>
+                    )}
                   </ListItem>
                 ))}
             </List>
           ) : (
-            <p style={{ opacity: 0.5, fontSize: 10 }}>No tasks</p>
+            <p
+              style={{
+                opacity: 0.5,
+                fontSize: 10,
+                display: isLead ? "none" : undefined,
+              }}
+            >
+              No tasks
+            </p>
           )}
           {!!newFields && newFields.kind === kind ? (
             <NewTask

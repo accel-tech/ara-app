@@ -217,10 +217,22 @@ export const ReportNotes: FC<{
       </div>
     );
   }
+
   if (status === "published") {
     return (
       <div>
-        <p>form to update</p>
+        {notes.length > 0 ? (
+          <ul style={{ marginBottom: 10 }}>
+            {notes.map((note) => (
+              <li key={note._id}>
+                <span>{note.text}</span> -{" "}
+                <i style={{ opacity: 0.5 }}>{note.addedBy.name}</i>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p style={{ opacity: 0.5, fontSize: 11 }}>No additional notes</p>
+        )}
       </div>
     );
   }

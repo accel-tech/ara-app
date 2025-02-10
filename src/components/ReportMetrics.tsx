@@ -14,13 +14,14 @@ import { InlineEditTextInput } from "./InlineEditTextInput";
 import { useFetch } from "../hooks/useFetch";
 import { typedUseStoreActions } from "../store";
 import { useDepartmentAccess } from "../hooks/useDepartmentAccess";
+import { capitalizeFirstLetter } from "../utils/misc";
 
 const keyInfoMap: Record<
   keyof Report["metrics"],
   { label: string; info?: string; unit?: string }
 > = {
-  origins_cpu: { label: "Origins CPU usage", info: "" },
-  origins_memory: { label: "Origins Memory usage", info: "" },
+  origins_cpu: { label: "Origins CPU usage", info: "", unit: "vCPU" },
+  origins_memory: { label: "Origins Memory usage", info: "", unit: "Gi" },
 };
 export const ReportMetrics: FC<{
   reportId: string;
@@ -88,7 +89,26 @@ export const ReportMetrics: FC<{
   if (status === "published") {
     return (
       <div>
-        <p>form to update</p>
+        <p style={{ opacity: 0.6, marginBottom: 10, fontSize: 11 }}>
+          PS: Will convert to charts and graphs
+        </p>
+        <DescriptionList isHorizontal isFluid isCompact>
+          {Object.keys(metrics).map((key: any) => (
+            <DescriptionListGroup key={key}>
+              <DescriptionListTerm>
+                {capitalizeFirstLetter(
+                  keyInfoMap[key as keyof Report["metrics"]].label || "-"
+                )}
+              </DescriptionListTerm>
+              <DescriptionListDescription>
+                {metrics[key as keyof Report["metrics"]] + ""}{" "}
+                <span style={{ opacity: 0.6, fontWeight: 500, fontSize: 12 }}>
+                  {keyInfoMap[key as keyof Report["metrics"]].unit}
+                </span>
+              </DescriptionListDescription>
+            </DescriptionListGroup>
+          ))}
+        </DescriptionList>
       </div>
     );
   }

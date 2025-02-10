@@ -15,7 +15,7 @@ import {
   ToolbarGroup,
   ToolbarItem,
 } from "@patternfly/react-core";
-import { FC, Fragment } from "react";
+import { FC, Fragment, useState } from "react";
 import { Report } from "../types/report";
 import { capitalizeFirstLetter, fmtDate1, urlizeString } from "../utils/misc";
 import { ReportMetrics } from "./ReportMetrics";
@@ -25,6 +25,7 @@ import { ReportNotes } from "./ReportNotes";
 import { useDepartmentAccess } from "../hooks/useDepartmentAccess";
 
 export const ReportDisplay: FC<{ report: Report }> = ({ report }) => {
+  const [isPreview, setPreview] = useState(false);
   const access = useDepartmentAccess(report.department._id);
   return (
     <PageSection
@@ -55,7 +56,12 @@ export const ReportDisplay: FC<{ report: Report }> = ({ report }) => {
             {access === "lead" && report.status === "draft" && (
               <Fragment>
                 <ToolbarItem>
-                  <Button variant="secondary">Preview</Button>
+                  <Button
+                    variant="secondary"
+                    onClick={() => setPreview(!isPreview)}
+                  >
+                    {isPreview ? "Return to Draft" : "Preview"}
+                  </Button>
                 </ToolbarItem>
                 <ToolbarItem>
                   <Button>Publish</Button>
@@ -66,7 +72,11 @@ export const ReportDisplay: FC<{ report: Report }> = ({ report }) => {
         </ToolbarContent>
       </Toolbar>
       <Sidebar tabIndex={0}>
-        <SidebarPanel variant="sticky" hasNoBackground>
+        <SidebarPanel
+          variant="sticky"
+          hasNoBackground
+          style={{ display: "none" }}
+        >
           <JumpLinks
             isVertical
             scrollableSelector="#scrollable-element"
@@ -100,9 +110,9 @@ export const ReportDisplay: FC<{ report: Report }> = ({ report }) => {
               Cloud Metrics
             </Title>
             <ReportMetrics
-              status={report.status}
-              metrics={report.metrics}
               reportId={report._id}
+              status={isPreview ? "published" : report.status}
+              metrics={report.metrics}
               departmentId={report.department._id}
             />
           </div>
@@ -112,9 +122,9 @@ export const ReportDisplay: FC<{ report: Report }> = ({ report }) => {
               Projects
             </Title>
             <ReportProjects
-              status={report.status}
-              projects={report.projects}
               reportId={report._id}
+              status={isPreview ? "published" : report.status}
+              projects={report.projects}
               departmentId={report.department._id}
             />
           </div>
@@ -124,9 +134,9 @@ export const ReportDisplay: FC<{ report: Report }> = ({ report }) => {
               Employee Certification
             </Title>
             <ReportCertifications
-              status={report.status}
-              certifications={report.certifications}
               reportId={report._id}
+              status={isPreview ? "published" : report.status}
+              certifications={report.certifications}
               departmentId={report.department._id}
             />
           </div>
@@ -137,7 +147,7 @@ export const ReportDisplay: FC<{ report: Report }> = ({ report }) => {
             </Title>
             <ReportNotes
               reportId={report._id}
-              status={report.status}
+              status={isPreview ? "published" : report.status}
               notes={report.notes}
               departmentId={report.department._id}
             />
