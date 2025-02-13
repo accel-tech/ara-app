@@ -17,16 +17,53 @@ import {
 } from "@patternfly/react-core";
 import { FC, Fragment, useState } from "react";
 import { Report } from "../types/report";
-import { capitalizeFirstLetter, fmtDate1, urlizeString } from "../utils/misc";
+import {
+  capitalizeFirstLetter,
+  fmtDate1,
+  fmtDate2,
+  urlizeString,
+} from "../utils/misc";
 import { ReportMetrics } from "./ReportMetrics";
 import { ReportProjects } from "./ReportProjects";
 import { ReportCertifications } from "./ReportCertifications";
 import { ReportNotes } from "./ReportNotes";
 import { useDepartmentAccess } from "../hooks/useDepartmentAccess";
+import { useFetch } from "../hooks/useFetch";
+import { typedUseStoreActions, typedUseStoreState } from "../store";
 
 export const ReportDisplay: FC<{ report: Report }> = ({ report }) => {
   const [isPreview, setPreview] = useState(false);
+  const [isPublishing, setPublishing] = useState(false);
   const access = useDepartmentAccess(report.department._id);
+  const httpRequest = useFetch();
+
+  const patchDocument = typedUseStoreActions(
+    (actions) => actions.reports.patchDocument
+  );
+
+  async function handlePublish() {
+    if (isPublishing) return;
+    setPublishing(true);
+    setPreview(true);
+    const { data, error } = await httpRequest(`/reports/${report._id}`, {
+      method: "PATCH",
+      body: JSON.stringify({ status: "published" }),
+    });
+    setPublishing(false);
+    if (error) {
+      console.log(error, "Failed to publish report");
+      // show toast
+      setPreview(isPreview);
+      return;
+    }
+    if (data) {
+      patchDocument({
+        _id: report._id,
+        fields: { status: "published", datePublished: new Date() },
+      });
+    }
+  }
+
   return (
     <PageSection
       isFilled
@@ -39,14 +76,27 @@ export const ReportDisplay: FC<{ report: Report }> = ({ report }) => {
             <ToolbarItem>
               <p style={{ fontWeight: 500, opacity: 0.5 }}>{report._id}</p>
             </ToolbarItem>
-            <ToolbarItem>
+            {/* <ToolbarItem>
               <p style={{ opacity: 0.5, color: "black" }}>
-                {fmtDate1(report.coveringDates.from)} to{" "}
-                {fmtDate1(report.coveringDates.to)}
+                <span style={{ fontWeight: 500 }}>
+                  {fmtDate1(report.coveringDates.from, "short")}
+                </span>{" "}
+                <span>{"<-->"}</span>{" "}
+                <span style={{ fontWeight: 500 }}>
+                  {fmtDate1(report.coveringDates.to, "short", true)}
+                </span>
               </p>
-            </ToolbarItem>
+            </ToolbarItem> */}
             <ToolbarItem>
-              {report.status === "draft" && <Label isCompact>DRAFT</Label>}
+              {report.status === "draft" && <Label>DRAFT</Label>}
+              {report.status === "published" && (
+                <Label color="blue">
+                  PUBLISHED{" "}
+                  <span style={{ opacity: 0.5 }}>
+                    {fmtDate2(report.datePublished)}
+                  </span>
+                </Label>
+              )}
             </ToolbarItem>
           </ToolbarGroup>
           <ToolbarGroup align={{ default: "alignEnd" }}>
@@ -59,12 +109,19 @@ export const ReportDisplay: FC<{ report: Report }> = ({ report }) => {
                   <Button
                     variant="secondary"
                     onClick={() => setPreview(!isPreview)}
+                    isDisabled={isPublishing}
                   >
                     {isPreview ? "Return to Draft" : "Preview"}
                   </Button>
                 </ToolbarItem>
                 <ToolbarItem>
-                  <Button>Publish</Button>
+                  <Button
+                    onClick={handlePublish}
+                    isLoading={isPublishing}
+                    isDisabled={isPublishing}
+                  >
+                    Publish
+                  </Button>
                 </ToolbarItem>
               </Fragment>
             )}
@@ -75,7 +132,7 @@ export const ReportDisplay: FC<{ report: Report }> = ({ report }) => {
         <SidebarPanel
           variant="sticky"
           hasNoBackground
-          style={{ display: "none" }}
+          // style={{ display: "none" }}
         >
           <JumpLinks
             isVertical

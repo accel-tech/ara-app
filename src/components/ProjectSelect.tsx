@@ -23,7 +23,8 @@ export const ProjectSelect: FC<{
   value: string;
   onValueChange: (val: string) => void;
   isDisabled?: boolean;
-}> = ({ value, onValueChange, isDisabled, departmentId }) => {
+  excludeOptionIds?: string[];
+}> = ({ value, onValueChange, isDisabled, departmentId, excludeOptionIds }) => {
   const [options, setOptions] = useState<
     Array<{
       _id: string;
@@ -152,6 +153,9 @@ export const ProjectSelect: FC<{
     >
       {options
         .filter((opt) => {
+          if (excludeOptionIds && excludeOptionIds.includes(opt._id)) {
+            return false;
+          }
           if (filterValue) return opt.title.includes(filterValue);
           return true;
         })

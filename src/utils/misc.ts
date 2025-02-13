@@ -87,10 +87,15 @@ export function dateToWeekRange(date: Date): {
   };
 }
 
-export function fmtDate1(date: Date, month?: "short" | "long") {
+export function fmtDate1(
+  date: Date,
+  month?: "short" | "long",
+  includeYear?: boolean
+) {
   const options: Intl.DateTimeFormatOptions = {
     month: month || "short",
     day: "numeric",
+    year: includeYear ? "numeric" : undefined,
   };
 
   return new Intl.DateTimeFormat("en-US", options).format(new Date(date)); // format to Jan. 29

@@ -38,7 +38,12 @@ export const CreateReportModal: FC<{
       from: "",
       to: "",
     },
-    options: { autoPopulateProjects: true, ignoreDateConflicts: false },
+    options: {
+      autoPopulateProjects: true,
+      autoPopulateCertifications: true,
+      autoPopulateMetrics: true,
+      ignoreDateConflicts: false,
+    },
   };
 
   const [fields, setFields] = useState(blankFields);
@@ -184,7 +189,7 @@ export const CreateReportModal: FC<{
             >
               <Checkbox
                 label="Automatically populate projects"
-                description="Selecting this option will cause the newly reported report to include all active projects in the department - ready to be filled with current tasks."
+                description="Selecting this option will cause the newly created report to include all projects in previous report."
                 isChecked={fields.options.autoPopulateProjects}
                 onChange={(_e, autoPopulateProjects) =>
                   setFields({
@@ -192,8 +197,36 @@ export const CreateReportModal: FC<{
                     options: { ...fields.options, autoPopulateProjects },
                   })
                 }
+                id="controlled-check-1"
+                name="check1"
+                isDisabled={isLoading}
+              />
+              <Checkbox
+                label="Automatically populate certifications"
+                description="Selecting this option will cause the newly created report to include all certifications in previous report."
+                isChecked={fields.options.autoPopulateCertifications}
+                onChange={(_e, autoPopulateCertifications) =>
+                  setFields({
+                    ...fields,
+                    options: { ...fields.options, autoPopulateCertifications },
+                  })
+                }
                 id="controlled-check-2"
                 name="check2"
+                isDisabled={isLoading}
+              />
+              <Checkbox
+                label="Automatically populate metrics"
+                description="Selecting this option will cause the newly created report to come with the metrics prefilled with data from previous report."
+                isChecked={fields.options.autoPopulateMetrics}
+                onChange={(_e, autoPopulateMetrics) =>
+                  setFields({
+                    ...fields,
+                    options: { ...fields.options, autoPopulateMetrics },
+                  })
+                }
+                id="controlled-check-3"
+                name="check3"
                 isDisabled={isLoading}
               />
               <Checkbox
@@ -206,8 +239,8 @@ export const CreateReportModal: FC<{
                     options: { ...fields.options, ignoreDateConflicts },
                   })
                 }
-                id="controlled-check-1"
-                name="check1"
+                id="controlled-check-4"
+                name="check4"
                 isDisabled={isLoading}
               />
             </div>

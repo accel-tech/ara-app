@@ -16,6 +16,8 @@ import { Dots } from "./Dots";
 import { dateToWeekRange, fmtDate1 } from "../utils/misc";
 import {
   CalendarAltIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
   ErrorCircleOIcon,
   WarningTriangleIcon,
 } from "@patternfly/react-icons";
@@ -26,7 +28,7 @@ import { Report } from "../types/report";
 import { typedUseStoreActions, typedUseStoreState } from "../store";
 
 export const ReportsPage: FC<{ departmentId: string }> = ({ departmentId }) => {
-  const [report, setReport] = useState<Report | null>(null);
+  // const [report, setReport] = useState<Report | null>(null);
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -36,16 +38,51 @@ export const ReportsPage: FC<{ departmentId: string }> = ({ departmentId }) => {
     (actions) => actions.reports.addDocuments
   );
 
-  // const [filters, setFilters] = useState<{ date: Date | null }>({
-  //   date: new Date("2024-12-12"),
-  // });
-
   const httpRequest = useFetch();
 
-  async function fetchReports() {
+  const report = useMemo(() => {
+    const reportId = searchParams.get("reportId");
+    const beforeDate = searchParams.get("beforeDate");
+    const afterDate = searchParams.get("afterDate");
+
+    return reports.find((rep) => {
+      if (beforeDate) {
+        const isBeforeDate =
+          new Date(beforeDate).getTime() >
+          new Date(rep.coveringDates.to).getTime();
+        if (!isBeforeDate) return false;
+      }
+
+      if (afterDate) {
+        const isAfterDate =
+          new Date(afterDate).getTime() <
+          new Date(rep.coveringDates.from).getTime();
+        if (!isAfterDate) return false;
+      }
+
+      if (reportId) {
+        const isSameId = rep._id === reportId;
+        if (!isSameId) return false;
+      }
+
+      return true;
+    });
+  }, [reportsKey, searchParams]);
+
+  async function findReport() {
     if (isLoading) return;
     setLoading(true);
     const query = [`departmentId=${departmentId}`];
+
+    const reportId = searchParams.get("reportId");
+    if (reportId) query.push(`reportId=${reportId}`);
+
+    const beforeDate = searchParams.get("beforeDate");
+    if (beforeDate) query.push(`beforeDate=${beforeDate}`);
+
+    const afterDate = searchParams.get("afterDate");
+    if (afterDate) query.push(`afterDate=${afterDate}`);
+
     const { data, error } = await httpRequest<Report>(
       `/reports/find?${query.join("&")}`
     );
@@ -58,20 +95,25 @@ export const ReportsPage: FC<{ departmentId: string }> = ({ departmentId }) => {
     }
   }
 
-  function findMatchingDocument() {
-    const report = reports.find((rep) => rep); // find matching;
-    if (report) {
-      setReport(report);
-      return;
-    } else {
-      fetchReports();
-      return;
-    }
+  function findNextReport() {
+    if (!report || isLoading) return;
+    setSearchParams({
+      afterDate: new Date(report.coveringDates.to).toISOString().split("T")[0],
+    });
+  }
+
+  function findPreviousReport() {
+    if (!report || isLoading) return;
+    setSearchParams({
+      beforeDate: new Date(report.coveringDates.from)
+        .toISOString()
+        .split("T")[0],
+    });
   }
 
   useEffect(() => {
-    if (!isLoading) findMatchingDocument();
-  }, [searchParams.toString(), reportsKey]);
+    if (!isLoading && !report) findReport();
+  }, [searchParams.toString()]);
 
   function Body() {
     // loading skeleton
@@ -144,12 +186,7 @@ export const ReportsPage: FC<{ departmentId: string }> = ({ departmentId }) => {
         >
           <EmptyStateBody>
             {searchParams.size < 1 ? (
-              <p>
-                <span style={{ fontWeight: 500, textDecoration: "underline" }}>
-                  Latest
-                </span>{" "}
-                report was not found
-              </p>
+              <p>There are no reports</p>
             ) : (
               <p>Report matching filters not found</p>
             )}
@@ -178,17 +215,51 @@ export const ReportsPage: FC<{ departmentId: string }> = ({ departmentId }) => {
             <ToolbarGroup align={{ default: "alignStart" }}></ToolbarGroup>
             <ToolbarGroup align={{ default: "alignEnd" }}>
               <ToolbarItem>
-                <SearchInput
-                  isDisabled={isLoading}
-                  // aria-label="Consumer toggle groups example search input"
-                  // onChange={(_event, value) => onInputChange(value)}
-                  // value={inputValue}
-                  // onClear={() => {
-                  //   onInputChange('');
-                  // }}
-                />
+                <Button variant="control" isDisabled>
+                  {isLoading ? (
+                    <>
+                      <Dots isAnimating />
+                    </>
+                  ) : report ? (
+                    <>
+                      {fmtDate1(
+                        dateToWeekRange(report.coveringDates.from).startOfWeek
+                      )}
+                      {" - "}
+                      {fmtDate1(
+                        dateToWeekRange(report.coveringDates.to).endOfWeek,
+                        undefined,
+                        true
+                      )}
+                      {searchParams.size === 0 && " (latest)"}
+                    </>
+                  ) : (
+                    "-"
+                  )}
+                </Button>
+                <Button
+                  variant="control"
+                  icon={<ChevronLeftIcon />}
+                  isDisabled={
+                    isLoading ||
+                    !report ||
+                    (!searchParams.get("afterDate") &&
+                      !searchParams.get("beforeDate"))
+                  }
+                  onClick={findNextReport}
+                ></Button>
+                <Button
+                  variant="control"
+                  icon={<ChevronRightIcon />}
+                  iconPosition="right"
+                  isDisabled={isLoading || !report}
+                  onClick={findPreviousReport}
+                ></Button>
               </ToolbarItem>
-              <ToolbarItem>
+              {/* <ToolbarItem>
+                <SearchInput isDisabled={isLoading} />
+              </ToolbarItem> */}
+              {/* <ToolbarItem>
                 <Button
                   variant="control"
                   icon={<CalendarAltIcon />}
@@ -217,9 +288,7 @@ export const ReportsPage: FC<{ departmentId: string }> = ({ departmentId }) => {
                     </span>
                   )}
                 </Button>
-                {/* left button for next */}
-                {/* right button for previous */}
-              </ToolbarItem>
+              </ToolbarItem> */}
             </ToolbarGroup>
           </ToolbarContent>
         </Toolbar>
