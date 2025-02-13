@@ -109,6 +109,9 @@ export const ReportCertifications: FC<{
         certifications.length === 0 && (
           <p>No certifications have been added by the department lead.</p>
         )}
+      {status === "published" && certifications.length === 0 && (
+        <p style={{ opacity: 0.5, fontSize: 11 }}>No certifications</p>
+      )}
       {completedCerts.length > 0 && (
         <div style={{ marginBottom: 15 }}>
           <List isPlain>

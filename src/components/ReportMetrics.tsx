@@ -68,7 +68,11 @@ export const ReportMetrics: FC<{
 
   if (status === "draft") {
     return (
-      <Form isHorizontal style={{ rowGap: 5 }}>
+      <Form
+        isHorizontal
+        style={{ rowGap: 5 }}
+        onSubmit={(e) => e.preventDefault()}
+      >
         {Object.keys(metrics).map((key: any) => (
           <FormGroup
             key={key}

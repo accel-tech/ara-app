@@ -101,20 +101,26 @@ export const ReportProjects: FC<{
 
       {projects.length > 0 && (
         <div style={{ display: "flex", flexDirection: "column", rowGap: 10 }}>
-          {projects.map((pro) => (
-            <ProjectComponent
-              key={pro._id}
-              project={pro}
-              reportId={reportId}
-              isEditable={
-                status === "draft" &&
-                (access === "lead" || pro.overseer._id === userId)
-              }
-              isLead={status === "draft" && access === "lead"}
-              onEdit={(fields) => onEditProject({ _id: pro._id, fields })}
-              onRemove={() => onRemoveProject(pro._id)}
-            />
-          ))}
+          {projects
+            .sort((a, b) => {
+              if (a.overseer._id === userId) return -1;
+              if (b.overseer._id === userId) return 1;
+              return 0;
+            })
+            .map((pro) => (
+              <ProjectComponent
+                key={pro._id}
+                project={pro}
+                reportId={reportId}
+                isEditable={
+                  status === "draft" &&
+                  (access === "lead" || pro.overseer._id === userId)
+                }
+                isLead={status === "draft" && access === "lead"}
+                onEdit={(fields) => onEditProject({ _id: pro._id, fields })}
+                onRemove={() => onRemoveProject(pro._id)}
+              />
+            ))}
         </div>
       )}
 
@@ -630,16 +636,20 @@ function NewTask({
   handleAdd: () => void;
   handleCancel: () => void;
 }) {
+  function handleSubmit(e: any) {
+    e.preventDefault();
+    handleAdd();
+  }
   return (
     <Panel variant="secondary" style={{ padding: 10 }}>
-      <div style={{ display: "flex", columnGap: 5 }}>
+      <Form style={{ display: "flex", columnGap: 5 }} onSubmit={handleSubmit}>
         <TextInput
           value={fields.text}
           onChange={(_e, text) => setFields({ ...fields, text })}
           isDisabled={isLoading}
           autoFocus
         />
-        <Button variant="link" onClick={handleAdd} isDisabled={isLoading}>
+        <Button variant="link" onClick={handleSubmit} isDisabled={isLoading}>
           Save
         </Button>
         <Button
@@ -650,7 +660,7 @@ function NewTask({
         >
           Cancel
         </Button>
-      </div>
+      </Form>
       {error && (
         <Alert
           variant="danger"

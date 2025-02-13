@@ -244,7 +244,8 @@ export const ReportsPage: FC<{ departmentId: string }> = ({ departmentId }) => {
                     isLoading ||
                     !report ||
                     (!searchParams.get("afterDate") &&
-                      !searchParams.get("beforeDate"))
+                      !searchParams.get("beforeDate")) ||
+                    report.status === "draft"
                   }
                   onClick={findNextReport}
                 ></Button>

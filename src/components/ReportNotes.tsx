@@ -3,6 +3,7 @@ import { Report } from "../types/report";
 import {
   Alert,
   Button,
+  Form,
   Icon,
   List,
   ListItem,
@@ -143,6 +144,11 @@ export const ReportNotes: FC<{
     }
   }
 
+  function handleSubmit(e: any) {
+    e.preventDefault();
+    handleAdd();
+  }
+
   if (status === "draft") {
     return (
       <div>
@@ -170,7 +176,10 @@ export const ReportNotes: FC<{
         )}
         {blankFields && (
           <Panel variant={undefined} style={{ padding: 10 }}>
-            <div style={{ display: "flex", columnGap: 5 }}>
+            <Form
+              style={{ display: "flex", columnGap: 5 }}
+              onSubmit={handleSubmit}
+            >
               <TextInput
                 value={blankFields.text}
                 onChange={(_e, text) =>
@@ -182,7 +191,7 @@ export const ReportNotes: FC<{
               />
               <Button
                 variant="link"
-                onClick={handleAdd}
+                onClick={handleSubmit}
                 // isLoading={isLoading ? true : undefined} // it changes default size when isLoading is defined
                 isDisabled={isLoading}
               >
@@ -196,7 +205,7 @@ export const ReportNotes: FC<{
               >
                 Cancel
               </Button>
-            </div>
+            </Form>
             {error && (
               <p style={{ color: "red" }}>
                 <Alert variant="danger" isInline isPlain title={error} />{" "}

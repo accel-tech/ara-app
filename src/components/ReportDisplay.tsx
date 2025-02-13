@@ -30,6 +30,7 @@ import { ReportNotes } from "./ReportNotes";
 import { useDepartmentAccess } from "../hooks/useDepartmentAccess";
 import { useFetch } from "../hooks/useFetch";
 import { typedUseStoreActions, typedUseStoreState } from "../store";
+import { DownloadIcon, FileDownloadIcon } from "@patternfly/react-icons";
 
 export const ReportDisplay: FC<{ report: Report }> = ({ report }) => {
   const [isPreview, setPreview] = useState(false);
@@ -125,6 +126,13 @@ export const ReportDisplay: FC<{ report: Report }> = ({ report }) => {
                 </ToolbarItem>
               </Fragment>
             )}
+            {report.status === "published" && (
+              <Button
+                icon={<FileDownloadIcon />}
+                variant="control"
+                onClick={() => window.alert("download feature not completed")}
+              ></Button>
+            )}
           </ToolbarGroup>
         </ToolbarContent>
       </Toolbar>
@@ -143,18 +151,21 @@ export const ReportDisplay: FC<{ report: Report }> = ({ report }) => {
             <JumpLinksItem href="#cloud-metrics">Cloud Metrics</JumpLinksItem>
             <JumpLinksItem href="#projects">
               Projects
-              {/* // if legnth loop through projects */}
-              {report.projects.length > 0 && (
-                <JumpLinksList>
-                  {report.projects.map((pro) => (
-                    <JumpLinksItem
-                      key={pro._id}
-                      href={`#${urlizeString(pro.title)}`}
-                    >
-                      {capitalizeFirstLetter(pro.title)}
-                    </JumpLinksItem>
-                  ))}
-                </JumpLinksList>
+              {report.projects.length < 1 ? (
+                <></>
+              ) : (
+                report.projects.length > 0 && (
+                  <JumpLinksList>
+                    {report.projects.map((pro) => (
+                      <JumpLinksItem
+                        key={pro._id}
+                        href={`#${urlizeString(pro.title)}`}
+                      >
+                        {capitalizeFirstLetter(pro.title)}
+                      </JumpLinksItem>
+                    ))}
+                  </JumpLinksList>
+                )
               )}
             </JumpLinksItem>
             <JumpLinksItem href="#certifications">Certifications</JumpLinksItem>
