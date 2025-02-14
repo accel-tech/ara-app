@@ -30,6 +30,7 @@ export default function BasicUserApp() {
               />
             }
             sidebar={<Sidebar isSidebarOpen={isSidebarOpen} />}
+            mainContainerId="scrollable-element"
             style={{
               height:
                 import.meta.env.VITE_APP_ENVIRONMENT !== "production"

@@ -145,7 +145,7 @@ export const ReportDisplay: FC<{ report: Report }> = ({ report }) => {
           <JumpLinks
             isVertical
             scrollableSelector="#scrollable-element"
-            offset={800}
+            offset={500}
             isExpanded
           >
             <JumpLinksItem href="#cloud-metrics">Cloud Metrics</JumpLinksItem>
@@ -172,54 +172,68 @@ export const ReportDisplay: FC<{ report: Report }> = ({ report }) => {
             <JumpLinksItem href="#notes">Additional Notes</JumpLinksItem>
           </JumpLinks>
         </SidebarPanel>
-        <SidebarContent hasNoBackground hasPadding id="scrollable-element">
-          <div style={{ padding: "20px 0" }}>
-            <Title headingLevel="h3" style={{ marginBottom: 10 }}>
-              Cloud Metrics
-            </Title>
-            <ReportMetrics
-              reportId={report._id}
-              status={isPreview ? "published" : report.status}
-              metrics={report.metrics}
-              departmentId={report.department._id}
-            />
-          </div>
-          <Divider />
-          <div style={{ padding: "20px 0" }}>
-            <Title headingLevel="h3" style={{ marginBottom: 10 }}>
-              Projects
-            </Title>
-            <ReportProjects
-              reportId={report._id}
-              status={isPreview ? "published" : report.status}
-              projects={report.projects}
-              departmentId={report.department._id}
-            />
-          </div>
-          <Divider />
-          <div style={{ padding: "20px 0" }}>
-            <Title headingLevel="h3" style={{ marginBottom: 10 }}>
-              Employee Certification
-            </Title>
-            <ReportCertifications
-              reportId={report._id}
-              status={isPreview ? "published" : report.status}
-              certifications={report.certifications}
-              departmentId={report.department._id}
-            />
-          </div>
-          <Divider />
-          <div style={{ padding: "20px 0" }}>
-            <Title headingLevel="h3" style={{ marginBottom: 10 }}>
-              Additional Notes
-            </Title>
-            <ReportNotes
-              reportId={report._id}
-              status={isPreview ? "published" : report.status}
-              notes={report.notes}
-              departmentId={report.department._id}
-            />
-          </div>
+        <SidebarContent hasNoBackground>
+          <PageSection style={{ padding: 0 }}>
+            <div style={{ padding: "20px 0" }}>
+              <Title
+                headingLevel="h3"
+                style={{ marginBottom: 10 }}
+                id="cloud-metrics"
+              >
+                Cloud Metrics
+              </Title>
+              <ReportMetrics
+                reportId={report._id}
+                status={isPreview ? "published" : report.status}
+                metrics={report.metrics}
+                departmentId={report.department._id}
+              />
+            </div>
+            <Divider />
+            <div style={{ padding: "20px 0" }}>
+              <Title
+                headingLevel="h3"
+                style={{ marginBottom: 10 }}
+                id="projects"
+              >
+                Projects
+              </Title>
+              <ReportProjects
+                reportId={report._id}
+                status={isPreview ? "published" : report.status}
+                projects={report.projects}
+                departmentId={report.department._id}
+              />
+            </div>
+            <Divider />
+            <div style={{ padding: "20px 0" }}>
+              <Title
+                headingLevel="h3"
+                style={{ marginBottom: 10 }}
+                id="certifications"
+              >
+                Employee Certification
+              </Title>
+              <ReportCertifications
+                reportId={report._id}
+                status={isPreview ? "published" : report.status}
+                certifications={report.certifications}
+                departmentId={report.department._id}
+              />
+            </div>
+            <Divider />
+            <div style={{ padding: "20px 0" }}>
+              <Title headingLevel="h3" style={{ marginBottom: 10 }} id="notes">
+                Additional Notes
+              </Title>
+              <ReportNotes
+                reportId={report._id}
+                status={isPreview ? "published" : report.status}
+                notes={report.notes}
+                departmentId={report.department._id}
+              />
+            </div>
+          </PageSection>
         </SidebarContent>
       </Sidebar>
     </PageSection>

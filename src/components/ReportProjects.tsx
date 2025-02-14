@@ -32,7 +32,11 @@ import { Project, ProjectTask, ReportProject } from "../types/project";
 import { EmployeeSelect } from "./EmployeeSelect";
 import { typedUseStoreActions, typedUseStoreState } from "../store";
 import { InlineEditTextInput } from "./InlineEditTextInput";
-import { capitalizeAllWords, capitalizeFirstLetter } from "../utils/misc";
+import {
+  capitalizeAllWords,
+  capitalizeFirstLetter,
+  urlizeString,
+} from "../utils/misc";
 
 export const ReportProjects: FC<{
   status: Report["status"];
@@ -498,7 +502,7 @@ function ProjectComponent({
             margin: "5px 0",
           }}
         >
-          <Title headingLevel="h3">
+          <Title headingLevel="h3" id={urlizeString(project.title)}>
             {capitalizeFirstLetter(project.title)}
           </Title>
           {isLead && (
