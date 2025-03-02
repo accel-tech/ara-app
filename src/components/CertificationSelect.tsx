@@ -17,6 +17,7 @@ import { useFetch } from "../hooks/useFetch";
 import { TimesIcon } from "@patternfly/react-icons";
 import { Project } from "../types/project";
 import { Certification } from "../types/certification";
+import { fmtDate1 } from "../utils/misc";
 
 export const CertificationSelect: FC<{
   departmentId: string;
@@ -31,6 +32,9 @@ export const CertificationSelect: FC<{
       title: string;
       employeeName: string;
       examCode?: string;
+      status: string;
+      dateProjected?: Date;
+      dateCompleted?: Date;
     }>
   >([]);
   const [isLoading, setLoading] = useState(false);
@@ -48,7 +52,7 @@ export const CertificationSelect: FC<{
     if (isLoading) return;
     setLoading(true);
     const { data, error } = await httpRequest<Certification[]>(
-      `/certifications?departmentId=${departmentId}`
+      `/certifications?departmentId=${departmentId}` // only relevant
     );
     setLoading(false);
     if (error) {
@@ -63,6 +67,10 @@ export const CertificationSelect: FC<{
           title: dt.title,
           employeeName: dt.employee.name,
           examCode: dt.examCode,
+          status: dt.status,
+          dateProjected: dt.dateProjected,
+          // @ts-ignore
+          dateCompleted: dt.dateCompleted,
         }))
       );
     }
@@ -166,11 +174,16 @@ export const CertificationSelect: FC<{
             value={opt._id}
             key={opt._id}
             description={
-              opt.employeeName + (opt.examCode ? ` (${opt.examCode})` : "")
+              opt.employeeName +
+              (opt.status === "completed"
+                ? ` - Completed on ${fmtDate1(opt.dateCompleted!)}`
+                : ` - Projected for ${
+                    opt.dateProjected ? fmtDate1(opt.dateProjected) : "NA"
+                  }`)
             }
             isDisabled={isLoading || isDisabled}
           >
-            {opt.title}
+            {opt.title + (opt.examCode ? ` (${opt.examCode})` : "")}
           </SelectOption>
         ))}
     </Select>

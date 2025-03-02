@@ -15,6 +15,7 @@ export interface Project {
     _id: string;
     title: string;
   };
+  writePolicy: "overseerOnly" | "allDepartment";
   dateClosed?: Date;
 }
 
@@ -28,7 +29,7 @@ export type ProjectTask = {
 
 export type ReportProject = Pick<
   Project,
-  "_id" | "title" | "description" | "overseer"
+  "_id" | "title" | "description" | "overseer" | "writePolicy"
 > & {
   tasks: Array<ProjectTask>;
 };

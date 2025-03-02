@@ -11,6 +11,7 @@ import {
   List,
   ListItem,
   Panel,
+  Radio,
   TextInput,
   Title,
 } from "@patternfly/react-core";
@@ -118,7 +119,9 @@ export const ReportProjects: FC<{
                 reportId={reportId}
                 isEditable={
                   status === "draft" &&
-                  (access === "lead" || pro.overseer._id === userId)
+                  (access === "lead" ||
+                    pro.overseer._id === userId ||
+                    pro.writePolicy === "allDepartment")
                 }
                 isLead={status === "draft" && access === "lead"}
                 onEdit={(fields) => onEditProject({ _id: pro._id, fields })}
@@ -166,6 +169,7 @@ function AddProjectPanel({
     title: string;
     description: string;
     overseerId: string;
+    writePolicy: string;
   } | null>(null);
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -173,7 +177,12 @@ function AddProjectPanel({
   const httpRequest = useFetch();
 
   function toggleNewProject() {
-    setNewProjectFields({ title: "", description: "", overseerId: "" });
+    setNewProjectFields({
+      title: "",
+      description: "",
+      overseerId: "",
+      writePolicy: "allDepartment",
+    });
   }
 
   async function handleSubmitExisting() {
@@ -204,6 +213,7 @@ function AddProjectPanel({
         description: data.description,
         overseer: data.overseer,
         tasks: [],
+        writePolicy: data.writePolicy,
       });
     }
   }
@@ -240,6 +250,7 @@ function AddProjectPanel({
         title: data.title,
         overseer: data.overseer,
         description: data.description,
+        writePolicy: data.writePolicy,
         tasks: [],
       });
     }
@@ -312,6 +323,35 @@ function AddProjectPanel({
                 value={newProjectFields.title}
                 onValueChange={(overseerId) =>
                   setNewProjectFields({ ...newProjectFields, overseerId })
+                }
+                isDisabled={isLoading}
+              />
+            </FormGroup>
+            <FormGroup label="Write Policy">
+              <Radio
+                name="writePolicy"
+                label="All members of the department can add tasks for this project."
+                id="write-allDepartment"
+                checked={newProjectFields.writePolicy === "allDepartment"}
+                onChange={(_e, checked) =>
+                  setNewProjectFields({
+                    ...newProjectFields,
+                    writePolicy: checked ? "allDepartment" : "overseerOnly",
+                  })
+                }
+                isDisabled={isLoading}
+              />
+
+              <Radio
+                name="writePolicy"
+                label="Only the overseer can add tasks on this project."
+                id="write-overseerOnly"
+                checked={newProjectFields.writePolicy === "overseerOnly"}
+                onChange={(_e, checked) =>
+                  setNewProjectFields({
+                    ...newProjectFields,
+                    writePolicy: checked ? "overseerOnly" : "allDepartment",
+                  })
                 }
                 isDisabled={isLoading}
               />
