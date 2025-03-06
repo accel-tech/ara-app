@@ -33,7 +33,7 @@ import { typedUseStoreActions, typedUseStoreState } from "../store";
 import { DownloadIcon, FileDownloadIcon } from "@patternfly/react-icons";
 
 export const ReportDisplay: FC<{ report: Report }> = ({ report }) => {
-  const [isPreview, setPreview] = useState(false);
+  const [isPreview, setPreview] = useState(true); // false
   const [isPublishing, setPublishing] = useState(false);
   const access = useDepartmentAccess(report.department._id);
   const httpRequest = useFetch();
@@ -68,7 +68,12 @@ export const ReportDisplay: FC<{ report: Report }> = ({ report }) => {
   return (
     <PageSection
       isFilled
-      // style={{ border: "1px solid #b9b9b9", borderRadius: 10 }}
+      style={{
+        // border: "1px solid rgb(232, 232, 232)",
+        borderRadius: 0,
+        // backgroundColor: "rgb(254, 252, 234)",
+        // backgroundColor: "rgb(246, 250, 254)",
+      }}
       variant="secondary"
     >
       <Toolbar id="toolbar-items-example">
@@ -148,7 +153,38 @@ export const ReportDisplay: FC<{ report: Report }> = ({ report }) => {
             offset={500}
             isExpanded
           >
-            <JumpLinksItem href="#cloud-metrics">Cloud Metrics</JumpLinksItem>
+            <JumpLinksItem href="#cloud-metrics">
+              Cloud Metrics
+              {report.status === "published" || isPreview ? (
+                <JumpLinksList>
+                  {[
+                    { title: "Origins (HP)", href: "#cloud-metrics-origins" },
+                    {
+                      title: "Origins (Linux One)",
+                      href: "#cloud-metrics-origins-l1",
+                    },
+                    {
+                      title: "Internal OCP",
+                      href: "#cloud-metrics-ocp",
+                    },
+                    {
+                      title: "Ceph Storage",
+                      href: "#cloud-metrics-ceph",
+                    },
+                    {
+                      title: "IBM FlashSystem",
+                      href: "#cloud-metrics-ibmflashsystem",
+                    },
+                  ].map((platform) => (
+                    <JumpLinksItem key={platform.href} href={platform.href}>
+                      {platform.title}
+                    </JumpLinksItem>
+                  ))}
+                </JumpLinksList>
+              ) : (
+                <></>
+              )}
+            </JumpLinksItem>
             <JumpLinksItem href="#projects">
               Projects
               {report.projects.length < 1 ? (
@@ -173,7 +209,7 @@ export const ReportDisplay: FC<{ report: Report }> = ({ report }) => {
           </JumpLinks>
         </SidebarPanel>
         <SidebarContent hasNoBackground>
-          <PageSection style={{ padding: 0 }}>
+          <PageSection style={{ padding: 0, background: "transparent" }}>
             <div style={{ padding: "20px 0" }}>
               <Title
                 headingLevel="h3"
@@ -187,6 +223,7 @@ export const ReportDisplay: FC<{ report: Report }> = ({ report }) => {
                 status={isPreview ? "published" : report.status}
                 metrics={report.metrics}
                 departmentId={report.department._id}
+                coveringDates={report.coveringDates}
               />
             </div>
             <Divider />

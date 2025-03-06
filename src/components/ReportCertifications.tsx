@@ -105,9 +105,9 @@ export const ReportCertifications: FC<{
   return (
     <div>
       {status === "draft" &&
-        access !== "lead" &&
+        !["lead", "member"].includes(access + "") &&
         certifications.length === 0 && (
-          <p>No certifications have been added by the department lead.</p>
+          <p>No certifications have been added.</p>
         )}
       {status === "published" && certifications.length === 0 && (
         <p style={{ opacity: 0.5, fontSize: 11 }}>No certifications</p>

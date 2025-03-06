@@ -58,6 +58,9 @@ export const InlineEditTextInput: FC<{
             <TextInput
               value={value}
               onChange={(_e, value) => setValue(value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleSave();
+              }}
               autoFocus
             />
           ) : (
