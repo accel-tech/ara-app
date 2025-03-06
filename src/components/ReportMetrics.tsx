@@ -20,6 +20,7 @@ import { useDepartmentAccess } from "../hooks/useDepartmentAccess";
 import {
   downtimeToUptimePercent,
   fmtByteValue,
+  fmtDate1,
   getPercentage,
   getPercentOfNumber,
   metricKeyInfoMap,
@@ -180,6 +181,10 @@ export const ReportMetrics: FC<{
             {
               span: 3,
               title: "Uptime",
+              description: `Platform uptime from ${fmtDate1(
+                coveringDates.from,
+                "long"
+              )} to ${fmtDate1(coveringDates.to, "long")}.`,
               kind: "statcard",
               component: {
                 value: `${downtimeToUptimePercent(
@@ -192,6 +197,7 @@ export const ReportMetrics: FC<{
             {
               span: 3,
               title: "Platform Status",
+              description: metricKeyInfoMap.origins_node_status.info,
               kind: "statcard",
               component: {
                 value: `${origins_node_status}`,
@@ -200,8 +206,8 @@ export const ReportMetrics: FC<{
             {
               span: 3,
               title: "Outages",
+              description: metricKeyInfoMap.origins_outages.info,
               kind: "statcard",
-              // helperText with <InfoIcon/>
               component: {
                 value: `${origins_outages}`, // string or react node?
                 // progression
@@ -211,6 +217,7 @@ export const ReportMetrics: FC<{
             {
               span: 3,
               title: "Mean Recovery Time",
+              description: metricKeyInfoMap.origins_mean_recovery_time.info,
               kind: "statcard",
               component: {
                 value: `${origins_mean_recovery_time}`,
@@ -220,6 +227,7 @@ export const ReportMetrics: FC<{
             {
               span: 4,
               title: "Storage Utilisation (Ceph)",
+              description: metricKeyInfoMap.origins_ceph_used.info,
               kind: "newdonutchart",
               component: {
                 donutChartProps: {
@@ -251,6 +259,7 @@ export const ReportMetrics: FC<{
             {
               span: 4,
               title: "Memory Utilisation (RAM)",
+              description: metricKeyInfoMap.origins_memory_used.info,
               kind: "newdonutchart",
               component: {
                 donutChartProps: {
@@ -286,6 +295,7 @@ export const ReportMetrics: FC<{
             {
               span: 4,
               title: "CPU Utilisation (cores)",
+              description: metricKeyInfoMap.origins_cpu_used.info,
               kind: "newdonutchart",
               component: {
                 donutChartProps: {
@@ -316,6 +326,7 @@ export const ReportMetrics: FC<{
             {
               span: 6,
               title: "Pods",
+              description: metricKeyInfoMap.origins_pods.info,
               kind: "statcard",
               component: {
                 value: `${origins_pods}`,
@@ -325,6 +336,7 @@ export const ReportMetrics: FC<{
             {
               span: 6,
               title: "Virtual Machines",
+              description: metricKeyInfoMap.origins_vms.info,
               kind: "statcard",
               component: {
                 value: `${origins_vms}`,
@@ -334,6 +346,7 @@ export const ReportMetrics: FC<{
             {
               span: 3,
               title: "API internal curl latency",
+              description: metricKeyInfoMap.origins_api_latency_internal.info,
               kind: "statcard",
               component: {
                 value: `${origins_api_latency_internal}`,
@@ -343,6 +356,8 @@ export const ReportMetrics: FC<{
             {
               span: 3,
               title: "Ingress internal curl latency",
+              description:
+                metricKeyInfoMap.origins_ingress_latency_internal.info,
               kind: "statcard",
               component: {
                 value: `${origins_ingress_latency_internal}`,
@@ -352,6 +367,7 @@ export const ReportMetrics: FC<{
             {
               span: 3,
               title: "API external curl latency",
+              description: metricKeyInfoMap.origins_api_latency_external.info,
               kind: "statcard",
               component: {
                 value: `${origins_api_latency_external}`,
@@ -361,6 +377,8 @@ export const ReportMetrics: FC<{
             {
               span: 3,
               title: "Ingress external curl latency",
+              description:
+                metricKeyInfoMap.origins_ingress_latency_external.info,
               kind: "statcard",
               component: {
                 value: `${origins_ingress_latency_external}`,
@@ -586,14 +604,16 @@ export const ReportMetrics: FC<{
                     y: getPercentage(ocp_ceph_used, ocp_ceph_available),
                   },
                   labels: [
-                    getPercentage(ocp_ceph_used, ocp_ceph_available, true) +
-                      "% used",
+                    fmtByteValue(ocp_ceph_used) + " used",
                     fmtByteValue(ocp_ceph_available - ocp_ceph_used) +
                       " remaining",
                   ],
                   name: "ocp ceph usage",
                   subTitle: "of " + fmtByteValue(ocp_ceph_available),
-                  title: fmtByteValue(ocp_ceph_used),
+
+                  title:
+                    getPercentage(ocp_ceph_used, ocp_ceph_available, true) +
+                    "%",
                 },
               },
             },
@@ -612,14 +632,16 @@ export const ReportMetrics: FC<{
                     y: getPercentage(ocp_memory_used, ocp_memory_available),
                   },
                   labels: [
-                    getPercentage(ocp_memory_used, ocp_memory_available, true) +
-                      "% used",
+                    fmtByteValue(ocp_memory_used) + " used",
                     fmtByteValue(ocp_memory_available - ocp_memory_used) +
                       " remaining",
                   ],
                   name: "ocp memory usage",
                   subTitle: "of " + fmtByteValue(ocp_memory_available),
-                  title: fmtByteValue(ocp_memory_used),
+
+                  title:
+                    getPercentage(ocp_memory_used, ocp_memory_available, true) +
+                    "%",
                 },
               },
             },
@@ -638,13 +660,13 @@ export const ReportMetrics: FC<{
                     y: getPercentage(ocp_cpu_used, ocp_cpu_available),
                   },
                   labels: [
-                    getPercentage(ocp_cpu_used, ocp_cpu_available, true) +
-                      "% used",
+                    ocp_cpu_used + " used",
                     ocp_cpu_available - ocp_cpu_used + " remaining",
                   ],
                   name: "ocp memory usage",
                   subTitle: "of " + ocp_cpu_available + " cores",
-                  title: ocp_cpu_used + "",
+                  title:
+                    getPercentage(ocp_cpu_used, ocp_cpu_available, true) + "%",
                 },
               },
             },
@@ -679,6 +701,17 @@ export const ReportMetrics: FC<{
               kind: "newbulletchart",
               component: {
                 bulletChartProps: {
+                  title:
+                    fmtByteValue(ceph_storage_used) +
+                    " (" +
+                    getPercentage(
+                      ceph_storage_used,
+                      ceph_storage_available,
+                      true
+                    ) +
+                    "%)",
+                  subTitle: "of " + fmtByteValue(ceph_storage_available),
+                  titlePosition: "top-left",
                   ariaDesc: "Storage consumption",
                   themeColor: ChartThemeColor.teal,
                   constrainToVisibleArea: true,
@@ -688,7 +721,7 @@ export const ReportMetrics: FC<{
                     bottom: 50,
                     left: 50,
                     right: 50,
-                    top: 10, // Adjusted to accommodate labels
+                    top: 80, // Adjusted to accommodate title
                   },
 
                   axisComponent: (
@@ -704,8 +737,6 @@ export const ReportMetrics: FC<{
                       theme={getTheme(ChartThemeColor.teal)}
                     />
                   ),
-                  labels: ({ datum }) =>
-                    `${datum.name}: ${fmtByteValue(datum.y)}`,
                   comparativeWarningMeasureData: [
                     {
                       name: "Warning Territory",
@@ -722,16 +753,27 @@ export const ReportMetrics: FC<{
                     {
                       name: "Origins HP",
                       y: origins_ceph_used,
+                      label: `Origins HP: ${fmtByteValue(origins_ceph_used)}`,
                     },
-                    { name: "Internal OCP", y: ocp_ceph_used },
-                    { name: "Total Used", y: ceph_storage_used },
+                    {
+                      name: "Internal OCP",
+                      y: ocp_ceph_used,
+                      label: `Internal OCP: ${fmtByteValue(ocp_ceph_used)}`,
+                    },
+                    {
+                      name: "Other",
+                      y: ceph_storage_used,
+                      label: `Other: ${fmtByteValue(
+                        ceph_storage_used - origins_ceph_used - ocp_ceph_used
+                      )}`,
+                    },
                   ],
 
                   maxDomain: { y: ceph_storage_available },
                   qualitativeRangeLegendData: [
                     { name: "Origins HP" },
                     { name: "Internal OCP" },
-                    { name: "Total Used" },
+                    { name: "Other" },
                   ],
                 },
               },
@@ -749,6 +791,17 @@ export const ReportMetrics: FC<{
               kind: "newbulletchart",
               component: {
                 bulletChartProps: {
+                  title:
+                    fmtByteValue(flashsystem_storage_used) +
+                    " (" +
+                    getPercentage(
+                      flashsystem_storage_used,
+                      flashsystem_storage_available,
+                      true
+                    ) +
+                    "%)",
+                  subTitle: "of " + fmtByteValue(flashsystem_storage_available),
+                  titlePosition: "top-left",
                   ariaDesc: "Storage consumption",
                   themeColor: ChartThemeColor.purple,
                   constrainToVisibleArea: true,
@@ -758,7 +811,7 @@ export const ReportMetrics: FC<{
                     bottom: 50,
                     left: 50,
                     right: 50,
-                    top: 10, // Adjusted to accommodate labels
+                    top: 80, // Adjusted to accommodate labels
                   },
 
                   axisComponent: (
@@ -774,8 +827,6 @@ export const ReportMetrics: FC<{
                       theme={getTheme(ChartThemeColor.purple)}
                     />
                   ),
-                  labels: ({ datum }) =>
-                    `${datum.name}: ${fmtByteValue(datum.y)}`,
                   comparativeWarningMeasureData: [
                     {
                       name: "Warning Territory",
@@ -789,11 +840,16 @@ export const ReportMetrics: FC<{
                     },
                   ],
                   qualitativeRangeData: [
-                    { name: "Total Used", y: flashsystem_storage_used },
+                    {
+                      name: "All Used",
+                      y: flashsystem_storage_used,
+                      label: `All Data: ${fmtByteValue(
+                        flashsystem_storage_used
+                      )}`,
+                    },
                   ],
-
                   maxDomain: { y: flashsystem_storage_available },
-                  qualitativeRangeLegendData: [{ name: "Total Used" }],
+                  qualitativeRangeLegendData: [{ name: "All Used" }],
                 },
               },
             },

@@ -1,6 +1,14 @@
-import { Card, CardTitle, CardBody, Skeleton } from "@patternfly/react-core";
+import {
+  Card,
+  CardTitle,
+  CardBody,
+  Skeleton,
+  Tooltip,
+  Button,
+} from "@patternfly/react-core";
 import { FC, ReactNode } from "react";
 import { DataUnavailable } from "./DataUnavailable";
+import { InfoCircleIcon, InfoIcon } from "@patternfly/react-icons";
 
 export type statCardProps = {
   title: string;
@@ -8,6 +16,7 @@ export type statCardProps = {
   unit?: string | ReactNode;
   unitFirst?: boolean;
   icon?: ReactNode;
+  description?: string;
 };
 
 export const StatCard: FC<statCardProps> = ({
@@ -16,11 +25,23 @@ export const StatCard: FC<statCardProps> = ({
   unit,
   unitFirst,
   icon,
+  description,
 }) => {
   return (
     <Card isCompact style={{ height: "100%" }} variant="default">
-      <CardTitle component="p" style={{ fontWeight: 400 }}>
-        {title || "-"}
+      <CardTitle
+        component="div"
+        style={{ display: "flex", justifyContent: "space-between" }}
+      >
+        <span style={{ fontWeight: undefined }}>{title}</span>
+        {description && (
+          <Tooltip content={<span>{description}</span>}>
+            <InfoCircleIcon
+              className="hover-opacity-full"
+              style={{ opacity: 0.5 }}
+            />
+          </Tooltip>
+        )}
       </CardTitle>
       <CardBody
         style={{

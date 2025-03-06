@@ -6,3 +6,7 @@
 .customized-list .pf-v6-c-list__item-icon {
   margin-top: 0px;
 }
+
+.hover-opacity-full:hover {
+  opacity: 1 !important;
+}

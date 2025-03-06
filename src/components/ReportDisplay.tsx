@@ -173,7 +173,7 @@ export const ReportDisplay: FC<{ report: Report }> = ({ report }) => {
                     },
                     {
                       title: "IBM FlashSystem",
-                      href: "#cloud-metrics-ibmflashsystem",
+                      href: "#cloud-metrics-flashsystem",
                     },
                   ].map((platform) => (
                     <JumpLinksItem key={platform.href} href={platform.href}>
