@@ -2,7 +2,6 @@ import {
   Nav,
   NavGroup,
   NavItem,
-  NavList,
   PageSidebar,
   PageSidebarBody,
 } from "@patternfly/react-core";
@@ -14,7 +13,7 @@ import { capitalizeFirstLetter, departmentToUrl } from "../utils/misc";
 
 type RouteGroup = { label: string; routes: { path: string; label: string }[] };
 
-export const Sidebar: FC<{ isSidebarOpen: boolean }> = ({ isSidebarOpen }) => {
+export const Sidebar: FC<{}> = ({}) => {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -23,7 +22,7 @@ export const Sidebar: FC<{ isSidebarOpen: boolean }> = ({ isSidebarOpen }) => {
   const routeGroups = getRoutes(user);
 
   return (
-    <PageSidebar isSidebarOpen={isSidebarOpen} id="vertical-sidebar">
+    <PageSidebar id="vertical-sidebar">
       <PageSidebarBody>
         <Nav aria-label="Default global" ouiaId="DefaultNav">
           {routeGroups.map((group) => (

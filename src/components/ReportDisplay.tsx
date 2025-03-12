@@ -17,23 +17,19 @@ import {
 } from "@patternfly/react-core";
 import { FC, Fragment, useState } from "react";
 import { Report } from "../types/report";
-import {
-  capitalizeFirstLetter,
-  fmtDate1,
-  fmtDate2,
-  urlizeString,
-} from "../utils/misc";
+import { capitalizeFirstLetter, fmtDate2, urlizeString } from "../utils/misc";
 import { ReportMetrics } from "./ReportMetrics";
 import { ReportProjects } from "./ReportProjects";
 import { ReportCertifications } from "./ReportCertifications";
 import { ReportNotes } from "./ReportNotes";
 import { useDepartmentAccess } from "../hooks/useDepartmentAccess";
 import { useFetch } from "../hooks/useFetch";
-import { typedUseStoreActions, typedUseStoreState } from "../store";
-import { DownloadIcon, FileDownloadIcon } from "@patternfly/react-icons";
+import { typedUseStoreActions } from "../store";
+import { FileDownloadIcon } from "@patternfly/react-icons";
+import { useConfirmModal, useToast } from "./ToolsWrapper";
 
 export const ReportDisplay: FC<{ report: Report }> = ({ report }) => {
-  const [isPreview, setPreview] = useState(true); // false
+  const [isPreview, setPreview] = useState(false);
   const [isPublishing, setPublishing] = useState(false);
   const access = useDepartmentAccess(report.department._id);
   const httpRequest = useFetch();

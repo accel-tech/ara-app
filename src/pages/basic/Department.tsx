@@ -6,7 +6,6 @@ import {
   EmptyStateFooter,
   PageSection,
   Title,
-  ToolbarItem,
 } from "@patternfly/react-core";
 import { Link, useParams } from "react-router-dom";
 import { typedUseStoreState } from "../../store";
@@ -21,6 +20,8 @@ import { useDepartmentAccess } from "../../hooks/useDepartmentAccess";
 import { useCreateReportModal } from "../../components/ToolsWrapper";
 
 export default function Department() {
+  console.log("Department rerendered...");
+
   const params = useParams();
   const urlizedCategory = params.category;
   const urlizedDepartment = params.department;
@@ -63,7 +64,6 @@ export default function Department() {
   }
 
   const access = useDepartmentAccess(department._id);
-  const openCreateReportModal = useCreateReportModal();
 
   return (
     <PageSection isFilled isCenterAligned hasBodyWrapper={false}>
@@ -85,18 +85,32 @@ export default function Department() {
         </div>
         <div>
           {access === "lead" && (
-            <Button
-              variant="control"
-              icon={<PlusIcon />}
-              onClick={() => openCreateReportModal(department._id)}
-              // isDisabled={isLoading}
-            >
-              New Report
-            </Button>
+            <CreateReportButton departmentId={department._id} />
           )}
         </div>
       </div>
       <ReportsPage departmentId={department._id} />
     </PageSection>
+  );
+}
+
+function CreateReportButton({
+  departmentId,
+  isDisabled,
+}: {
+  isDisabled?: boolean;
+  departmentId: string;
+}) {
+  const openCreateReportModal = useCreateReportModal();
+
+  return (
+    <Button
+      variant="control"
+      icon={<PlusIcon />}
+      onClick={() => openCreateReportModal(departmentId)}
+      isDisabled={isDisabled}
+    >
+      New Report
+    </Button>
   );
 }

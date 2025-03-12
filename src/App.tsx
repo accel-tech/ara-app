@@ -1,7 +1,5 @@
 import { LoadingHeader, PlainHeader } from "./components/Header";
 import "@patternfly/react-core/dist/styles/base.css";
-
-import { Suspense, lazy } from "react";
 import {
   Button,
   EmptyState,
@@ -11,11 +9,12 @@ import {
   Spinner,
   Content,
 } from "@patternfly/react-core";
-
 import { typedUseStoreState } from "./store";
 import { Dots } from "./components/Dots";
 import { ExclamationCircleIcon } from "@patternfly/react-icons";
 import { useInitAuth } from "./hooks/useInitAuth";
+import BasicUserApp from "./apps/Basic";
+import AdminUserApp from "./apps/Admin";
 
 function App() {
   const { isLoading, user, errorMessage } = typedUseStoreState(
@@ -103,23 +102,33 @@ function GuestApp() {
 }
 
 function UserApp({ role }: { role: string }) {
-  const AdminUserApp = lazy(() => import("./apps/Admin"));
-  const BasicUserApp = lazy(() => import("./apps/Basic"));
+  if (role == "basic") {
+    return <BasicUserApp />;
+  }
 
-  return (
-    <Suspense fallback={<LoadingApp />}>
-      {(() => {
-        if (role === "admin") {
-          return <AdminUserApp />;
-        }
-        if (role === "basic") {
-          return <BasicUserApp />;
-        }
+  if (role === "admin") {
+    return <AdminUserApp />;
+  }
 
-        return <ErrorApp />;
-      })()}
-    </Suspense>
-  );
+  return <ErrorApp />;
+
+  // const AdminUserApp = lazy(() => import("./apps/Admin"));
+  // const BasicUserApp = lazy(() => import("./apps/Basic"));
+
+  // return (
+  //   <Suspense fallback={<LoadingApp />}>
+  //     {(() => {
+  //       if (role === "admin") {
+  //         return <AdminUserApp />;
+  //       }
+  //       if (role === "basic") {
+  //         return <BasicUserApp />;
+  //       }
+
+  //       return <ErrorApp />;
+  //     })()}
+  //   </Suspense>
+  // );
 }
 
 export default App;

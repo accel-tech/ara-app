@@ -40,6 +40,8 @@ export const ReportsPage: FC<{ departmentId: string }> = ({ departmentId }) => {
 
   const httpRequest = useFetch();
 
+  console.log("Report rerendered...");
+
   const report = useMemo(() => {
     const reportId = searchParams.get("reportId");
     const beforeDate = searchParams.get("beforeDate");

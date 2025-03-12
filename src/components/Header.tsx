@@ -23,10 +23,7 @@ import { typedUseStoreState } from "../store";
 import { Link } from "react-router-dom";
 import { BellIcon as _BellIcon, BarsIcon } from "@patternfly/react-icons";
 
-export const Header: React.FC<{
-  toggleSidebar: () => void;
-  isSidebarOpen: boolean;
-}> = ({ toggleSidebar, isSidebarOpen }) => {
+export const Header: React.FC<{}> = () => {
   return (
     <Masthead>
       <MastheadMain>
@@ -34,8 +31,6 @@ export const Header: React.FC<{
           <PageToggleButton
             variant="plain"
             aria-label="Global navigation"
-            isSidebarOpen={isSidebarOpen}
-            onSidebarToggle={toggleSidebar}
             id="vertical-nav-toggle"
           >
             <BarsIcon />

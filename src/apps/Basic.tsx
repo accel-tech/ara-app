@@ -9,13 +9,7 @@ import Placeholder from "../pages/basic/Placeholder";
 import Department from "../pages/basic/Department";
 
 export default function BasicUserApp() {
-  const [isSidebarOpen, setSidebarOpen] = useState(false);
-
-  function toggleSidebar() {
-    setSidebarOpen((currentVal) => !currentVal);
-  }
-
-  console.log("rerenderd");
+  console.log("Home rendered");
 
   return (
     <Fragment>
@@ -23,13 +17,9 @@ export default function BasicUserApp() {
         <ToolsWrapper>
           <AppEnvironemntBanner />
           <Page
-            masthead={
-              <Header
-                toggleSidebar={toggleSidebar}
-                isSidebarOpen={isSidebarOpen}
-              />
-            }
-            sidebar={<Sidebar isSidebarOpen={isSidebarOpen} />}
+            isManagedSidebar
+            masthead={<Header />}
+            sidebar={<Sidebar />}
             mainContainerId="scrollable-element"
             style={{
               height:
@@ -40,11 +30,8 @@ export default function BasicUserApp() {
             isContentFilled
           >
             <Routes>
-              <Route
-                path="/:category/:department"
-                Component={() => <Department />}
-              />
-              <Route path="/" Component={() => <Placeholder />} />
+              <Route path="/:category/:department" element={<Department />} />
+              <Route path="/" element={<Placeholder />} />
             </Routes>
           </Page>
         </ToolsWrapper>
