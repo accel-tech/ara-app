@@ -26,7 +26,6 @@ import { useDepartmentAccess } from "../hooks/useDepartmentAccess";
 import { useFetch } from "../hooks/useFetch";
 import { typedUseStoreActions } from "../store";
 import { FileDownloadIcon } from "@patternfly/react-icons";
-import { useConfirmModal, useToast } from "./ToolsWrapper";
 
 export const ReportDisplay: FC<{ report: Report }> = ({ report }) => {
   const [isPreview, setPreview] = useState(false);
@@ -138,91 +137,35 @@ export const ReportDisplay: FC<{ report: Report }> = ({ report }) => {
         </ToolbarContent>
       </Toolbar>
       <Sidebar tabIndex={0}>
-        <SidebarPanel
-          variant="sticky"
-          hasNoBackground
-          // style={{ display: "none" }}
-        >
-          <JumpLinks
-            isVertical
-            scrollableSelector="#scrollable-element"
-            offset={500}
-            isExpanded
-          >
-            <JumpLinksItem href="#cloud-metrics">
-              Cloud Metrics
-              {report.status === "published" || isPreview ? (
-                <JumpLinksList>
-                  {[
-                    { title: "Origins (HP)", href: "#cloud-metrics-origins" },
-                    {
-                      title: "Origins (Linux One)",
-                      href: "#cloud-metrics-origins-l1",
-                    },
-                    {
-                      title: "Internal OCP",
-                      href: "#cloud-metrics-ocp",
-                    },
-                    {
-                      title: "Ceph Storage",
-                      href: "#cloud-metrics-ceph",
-                    },
-                    {
-                      title: "IBM FlashSystem",
-                      href: "#cloud-metrics-flashsystem",
-                    },
-                  ].map((platform) => (
-                    <JumpLinksItem key={platform.href} href={platform.href}>
-                      {platform.title}
-                    </JumpLinksItem>
-                  ))}
-                </JumpLinksList>
-              ) : (
-                <></>
-              )}
-            </JumpLinksItem>
-            <JumpLinksItem href="#projects">
-              Projects
-              {report.projects.length < 1 ? (
-                <></>
-              ) : (
-                report.projects.length > 0 && (
-                  <JumpLinksList>
-                    {report.projects.map((pro) => (
-                      <JumpLinksItem
-                        key={pro._id}
-                        href={`#${urlizeString(pro.title)}`}
-                      >
-                        {capitalizeFirstLetter(pro.title)}
-                      </JumpLinksItem>
-                    ))}
-                  </JumpLinksList>
-                )
-              )}
-            </JumpLinksItem>
-            <JumpLinksItem href="#certifications">Certifications</JumpLinksItem>
-            <JumpLinksItem href="#notes">Additional Notes</JumpLinksItem>
-          </JumpLinks>
+        <SidebarPanel variant="sticky" hasNoBackground>
+          <JumpLinksSidebar
+            status={isPreview ? "published" : report.status}
+            projects={report.projects.map((pro) => pro.title)}
+          />
         </SidebarPanel>
         <SidebarContent hasNoBackground>
           <PageSection style={{ padding: 0, background: "transparent" }}>
-            <div style={{ padding: "20px 0" }}>
-              <Title
-                headingLevel="h3"
-                style={{ marginBottom: 10 }}
-                id="cloud-metrics"
-              >
-                Cloud Metrics
-              </Title>
-              <ReportMetrics
-                reportId={report._id}
-                status={isPreview ? "published" : report.status}
-                metrics={report.metrics}
-                departmentId={report.department._id}
-                coveringDates={report.coveringDates}
-              />
-            </div>
-            <Divider />
+            {(isPreview || report.status === "published") && (
+              <Fragment>
+                <div style={{ padding: "20px 0" }}>
+                  <Title
+                    headingLevel="h3"
+                    style={{ marginBottom: 10 }}
+                    id="cloud-metrics"
+                  >
+                    Cloud Metrics
+                  </Title>
+                  <ReportMetrics
+                    reportId={report._id}
+                    status="published"
+                    metrics={report.metrics}
+                    departmentId={report.department._id}
+                    coveringDates={report.coveringDates}
+                  />
+                </div>
+                <Divider />
+              </Fragment>
+            )}
             <div style={{ padding: "20px 0" }}>
               <Title
                 headingLevel="h3"
@@ -266,9 +209,127 @@ export const ReportDisplay: FC<{ report: Report }> = ({ report }) => {
                 departmentId={report.department._id}
               />
             </div>
+            {!isPreview && report.status === "draft" && (
+              <Fragment>
+                <Divider />
+                <div style={{ padding: "20px 0" }}>
+                  <Title
+                    headingLevel="h3"
+                    style={{ marginBottom: 10 }}
+                    id="cloud-metrics"
+                  >
+                    Cloud Metrics
+                  </Title>
+                  <ReportMetrics
+                    reportId={report._id}
+                    status="draft"
+                    metrics={report.metrics}
+                    departmentId={report.department._id}
+                    coveringDates={report.coveringDates}
+                  />
+                </div>
+              </Fragment>
+            )}
           </PageSection>
         </SidebarContent>
       </Sidebar>
     </PageSection>
   );
 };
+
+function JumpLinksSidebar({
+  projects,
+  status,
+}: {
+  projects: string[];
+  status: Report["status"];
+}) {
+  console.log("rendered sidebar");
+
+  if (status === "draft") {
+    return (
+      <JumpLinks
+        isVertical
+        scrollableSelector="#scrollable-element"
+        offset={500}
+        isExpanded
+      >
+        <JumpLinksItem href="#projects">
+          Projects
+          {projects.length < 1 ? (
+            <></>
+          ) : (
+            <JumpLinksList>
+              {projects.map((pro) => (
+                <JumpLinksItem key={pro} href={`#${urlizeString(pro)}`}>
+                  {capitalizeFirstLetter(pro)}
+                </JumpLinksItem>
+              ))}
+            </JumpLinksList>
+          )}
+        </JumpLinksItem>
+        <JumpLinksItem href="#certifications">Certifications</JumpLinksItem>
+        <JumpLinksItem href="#notes">Additional Notes</JumpLinksItem>
+        <JumpLinksItem href="#cloud-metrics">Cloud Metrics</JumpLinksItem>
+      </JumpLinks>
+    );
+  }
+
+  if (status === "published") {
+    return (
+      <JumpLinks
+        isVertical
+        scrollableSelector="#scrollable-element"
+        offset={500}
+        isExpanded
+      >
+        <JumpLinksItem href="#cloud-metrics">
+          Cloud Metrics
+          <JumpLinksList>
+            {[
+              { title: "Origins (HP)", href: "#cloud-metrics-origins" },
+              {
+                title: "Origins (Linux One)",
+                href: "#cloud-metrics-origins-l1",
+              },
+              {
+                title: "Internal OCP",
+                href: "#cloud-metrics-ocp",
+              },
+              {
+                title: "Ceph Storage",
+                href: "#cloud-metrics-ceph",
+              },
+              {
+                title: "IBM FlashSystem",
+                href: "#cloud-metrics-flashsystem",
+              },
+            ].map((platform) => (
+              <JumpLinksItem key={platform.href} href={platform.href}>
+                {platform.title}
+              </JumpLinksItem>
+            ))}
+          </JumpLinksList>
+        </JumpLinksItem>
+        <JumpLinksItem href="#projects">
+          Projects
+          {projects.length < 1 ? (
+            <></>
+          ) : (
+            <JumpLinksList>
+              {projects.map((pro) => (
+                <JumpLinksItem key={pro} href={`#${urlizeString(pro)}`}>
+                  {capitalizeFirstLetter(pro)}
+                </JumpLinksItem>
+              ))}
+            </JumpLinksList>
+          )}
+        </JumpLinksItem>
+        <JumpLinksItem href="#certifications">Certifications</JumpLinksItem>
+        <JumpLinksItem href="#notes">Additional Notes</JumpLinksItem>
+      </JumpLinks>
+    );
+  }
+
+  return <></>;
+}
