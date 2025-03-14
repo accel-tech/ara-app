@@ -124,34 +124,6 @@ export const ReportsPage: FC<{ departmentId: string }> = ({ departmentId }) => {
         <EmptyState
           titleText={
             <div style={{ display: "flex" }}>
-              {/* {!searchParams.get("date") ? (
-                <p>
-                  Loading{" "}
-                  <span
-                    style={{ fontWeight: 500, textDecoration: "underline" }}
-                  >
-                    Latest
-                  </span>{" "}
-                  Report
-                </p>
-              ) : (
-                <span>
-                  Loading Report for{" "}
-                  <span
-                    style={{ fontWeight: 500, textDecoration: "underline" }}
-                  >
-                    {fmtDate1(
-                      dateToWeekRange(new Date(searchParams.get("date")!))
-                        .startOfWeek
-                    )}
-                    {" - "}
-                    {fmtDate1(
-                      dateToWeekRange(new Date(searchParams.get("date")!))
-                        .endOfWeek
-                    )}
-                  </span>
-                </span>
-              )} */}
               <p>Loading Report</p>
               <Dots isAnimating={true} />
             </div>
@@ -246,7 +218,8 @@ export const ReportsPage: FC<{ departmentId: string }> = ({ departmentId }) => {
                     isLoading ||
                     !report ||
                     (!searchParams.get("afterDate") &&
-                      !searchParams.get("beforeDate")) ||
+                      !searchParams.get("beforeDate") &&
+                      !searchParams.get("reportId")) ||
                     report.status === "draft"
                   }
                   onClick={findNextReport}

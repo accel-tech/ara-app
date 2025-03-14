@@ -5,8 +5,8 @@ import { Header } from "../components/Header";
 import { ToolsWrapper } from "../components/ToolsWrapper";
 import { AppEnvironemntBanner } from "../components/AppEnvironmentBanner";
 import { Sidebar } from "../components/Sidebar";
-import Placeholder from "../pages/basic/Placeholder";
 import Department from "../pages/basic/Department";
+import Home from "../pages/basic/Home";
 
 export default function BasicUserApp() {
   console.log("Home rendered");
@@ -31,7 +31,7 @@ export default function BasicUserApp() {
           >
             <Routes>
               <Route path="/:category/:department" element={<Department />} />
-              <Route path="/" element={<Placeholder />} />
+              <Route path="/" element={<Home />} />
             </Routes>
           </Page>
         </ToolsWrapper>

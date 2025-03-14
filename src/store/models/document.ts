@@ -44,7 +44,7 @@ export function createDocumentModel<T extends { _id: string }>(
 ): DocumentModel<T> {
   return {
     key: 0,
-    isLoading: true,
+    isLoading: false,
     isInitialized: false,
     documents: initialDocuments || [],
     loadingDocs: [],

@@ -1,4 +1,6 @@
 import {
+  Breadcrumb,
+  BreadcrumbItem,
   Button,
   EmptyState,
   EmptyStateActions,
@@ -67,6 +69,15 @@ export default function Department() {
 
   return (
     <PageSection isFilled isCenterAligned hasBodyWrapper={false}>
+      <Breadcrumb>
+        <BreadcrumbItem>
+          <Link to="/">Home</Link>
+        </BreadcrumbItem>
+
+        <BreadcrumbItem>Department</BreadcrumbItem>
+
+        <BreadcrumbItem isActive>Report</BreadcrumbItem>
+      </Breadcrumb>
       <div
         style={{
           display: "flex",

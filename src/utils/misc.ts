@@ -193,6 +193,26 @@ export function getPercentOfNumber(
 //   return diff;
 // }
 
+export function combineWithoutDuplicateId<T extends { _id: string }>(
+  oldArray: T[],
+  newArray: T[],
+  policy?: "replace" | "ignore"
+) {
+  let array = [...oldArray];
+  for (const item of newArray) {
+    const exists = array.findIndex((it) => it._id === item._id);
+    if (exists === -1) {
+      array.push(item);
+      continue;
+    }
+    // duplicate exists
+    if (policy === "ignore") continue;
+
+    array[exists] = item;
+  }
+  return array;
+}
+
 export const metricKeyInfoMap: Record<
   keyof Report["metrics"]["data"],
   { label: string; info?: string; unit?: string }

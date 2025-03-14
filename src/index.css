@@ -10,3 +10,17 @@
 .hover-opacity-full:hover {
   opacity: 1 !important;
 }
+
+.live-card-secondary:hover {
+  --pf-v6-c-card--BackgroundColor: #d8d8d8 !important;
+}
+.live-card-secondary:active {
+  --pf-v6-c-card--BackgroundColor: #d3d3d3 !important;
+}
+
+.live-card-primary:hover {
+  --pf-v6-c-card--BackgroundColor: #fbfbfb !important;
+}
+.live-card-primary:active {
+  --pf-v6-c-card--BackgroundColor: #f4f4f4 !important;
+}
