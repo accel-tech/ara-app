@@ -137,9 +137,10 @@ function UserDropdown() {
             </div>
           </DropdownItem>
           <Divider component="li" key="separator" />
-          <DropdownItem onClick={openPreferencesModal}>
+          {/* Hidden cause dark mode isn't complete */}
+          {/* <DropdownItem onClick={openPreferencesModal}>
             Preferences
-          </DropdownItem>
+          </DropdownItem> */}
           <DropdownItem onClick={handleLogout}>Logout</DropdownItem>
         </DropdownList>
       </Dropdown>
