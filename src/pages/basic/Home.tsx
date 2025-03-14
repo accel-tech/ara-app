@@ -8,11 +8,16 @@ import { typedUseStoreState } from "../../store";
 import { User } from "../../types/user";
 import { DepartmentCard } from "../../components/DepartmentCard";
 import { RecentReports } from "../../components/RecentReports";
+import Placeholder from "./Placeholder";
 
 export default function Home() {
   const user = typedUseStoreState(
     (state) => state.auth.user! as User & { role: "basic" }
   );
+
+  if (user.departmentAccess.length === 0) {
+    return <Placeholder />;
+  }
 
   return (
     <PageSection

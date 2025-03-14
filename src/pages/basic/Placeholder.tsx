@@ -3,21 +3,21 @@ import {
   EmptyStateBody,
   PageSection,
 } from "@patternfly/react-core";
-import { UserIcon } from "@patternfly/react-icons";
+import { HomeIcon } from "@patternfly/react-icons";
 
 export default function Placeholder() {
   return (
     <PageSection isFilled isCenterAligned hasBodyWrapper={false}>
       <EmptyState
-        titleText="Basic User App"
+        titleText="Reporting App"
         headingLevel="h4"
-        icon={UserIcon}
+        icon={HomeIcon}
         style={{ maxWidth: 600, margin: "auto" }}
         isFullHeight
       >
         <EmptyStateBody>
-          This is the basic user app. This is the app that will be accessed by
-          users, whether it be regular engineers, team leads, or directors.
+          Welcome to the reporting app. Contact your administrator to place you
+          in the correct departments.
         </EmptyStateBody>
       </EmptyState>
     </PageSection>
