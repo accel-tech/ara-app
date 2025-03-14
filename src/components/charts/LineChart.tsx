@@ -4,7 +4,6 @@ import { AnimationEvent, ChartConfiguration } from "chart.js";
 import { Chart } from "chart.js/auto";
 import { DataUnavailable } from "./DataUnavailable";
 import { cl, wait } from "../../utils/misc";
-import { easingEffects } from "chart.js/helpers";
 
 export type lineChartProps = {
   title: string;

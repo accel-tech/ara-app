@@ -5,7 +5,6 @@ import {
   EmptyStateBody,
   EmptyStateFooter,
   PageSection,
-  SearchInput,
   Toolbar,
   ToolbarContent,
   ToolbarGroup,
@@ -15,7 +14,6 @@ import { FC, useEffect, useMemo, useState } from "react";
 import { Dots } from "./Dots";
 import { dateToWeekRange, fmtDate1 } from "../utils/misc";
 import {
-  CalendarAltIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   ErrorCircleOIcon,

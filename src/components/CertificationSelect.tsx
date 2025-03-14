@@ -1,21 +1,16 @@
 import {
-  Avatar,
   Button,
-  LabelGroup,
   MenuToggle,
   MenuToggleElement,
   Select,
-  SelectList,
   SelectOption,
-  SelectOptionProps,
   TextInputGroup,
   TextInputGroupMain,
   TextInputGroupUtilities,
 } from "@patternfly/react-core";
-import { FC, Ref, useEffect, useRef, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import { useFetch } from "../hooks/useFetch";
 import { TimesIcon } from "@patternfly/react-icons";
-import { Project } from "../types/project";
 import { Certification } from "../types/certification";
 import { fmtDate1 } from "../utils/misc";
 

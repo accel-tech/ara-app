@@ -1,10 +1,8 @@
 import { FC, Fragment, useState } from "react";
 import { Report } from "../types/report";
 import {
-  ActionGroup,
   Alert,
   Button,
-  Content,
   Divider,
   Form,
   FormGroup,
@@ -17,14 +15,11 @@ import {
 } from "@patternfly/react-core";
 import {
   CalendarAltIcon,
-  CheckCircleIcon,
   CheckIcon,
   CircleIcon,
   PauseCircleIcon,
   PlusIcon,
-  StopIconConfig,
   WarningTriangleIcon,
-  WarningTriangleIconConfig,
 } from "@patternfly/react-icons";
 import { useDepartmentAccess } from "../hooks/useDepartmentAccess";
 import { ProjectSelect } from "./ProjectSelect";
@@ -732,20 +727,20 @@ function getTitle(kind: string) {
   }
 }
 
-function getIcon(kind: string) {
-  switch (kind) {
-    case "completed":
-      return <CheckCircleIcon style={{ color: "green" }} />;
-    case "upcoming":
-      return <CalendarAltIcon style={{ color: "orange" }} />;
-    case "challenge":
-      return <WarningTriangleIcon style={{ color: "red" }} />;
-    case "standby":
-      return <PauseCircleIcon />;
-    default:
-      return <CircleIcon />;
-  }
-}
+// function getIcon(kind: string) {
+//   switch (kind) {
+//     case "completed":
+//       return <CheckCircleIcon style={{ color: "green" }} />;
+//     case "upcoming":
+//       return <CalendarAltIcon style={{ color: "orange" }} />;
+//     case "challenge":
+//       return <WarningTriangleIcon style={{ color: "red" }} />;
+//     case "standby":
+//       return <PauseCircleIcon />;
+//     default:
+//       return <CircleIcon />;
+//   }
+// }
 
 function getListIcon(kind: string) {
   switch (kind) {

@@ -1,7 +1,6 @@
 import { FC, Fragment, useState } from "react";
 import { Report } from "../types/report";
 import {
-  ActionGroup,
   Alert,
   Button,
   Content,
@@ -9,7 +8,6 @@ import {
   DataList,
   DataListAction,
   DataListCell,
-  DataListContent,
   DataListItem,
   DataListItemCells,
   DataListItemRow,
@@ -29,11 +27,8 @@ import {
   CalendarAltIcon,
   CalendarDayIcon,
   CheckCircleIcon,
-  CheckIcon,
   PenIcon,
   PlusIcon,
-  TimesIcon,
-  TrashIcon,
 } from "@patternfly/react-icons";
 import { useDepartmentAccess } from "../hooks/useDepartmentAccess";
 import { EmployeeSelect } from "./EmployeeSelect";
@@ -592,208 +587,208 @@ function AddCertificationPanel({
   );
 }
 
-function NewCertificationForm({
-  departmentId,
-  onClose,
-  onAdd,
-}: {
-  departmentId: string;
-  onClose: () => void;
-  onAdd: (newCert: Certification) => void;
-}) {
-  const [blankFields, setBlankFields] = useState<{
-    title: string;
-    examCode: string;
-    examLink: string;
-    status: string;
-    statusDate: string;
-    employeeId?: string;
-  }>({
-    title: "",
-    examCode: "",
-    examLink: "",
-    status: "projected",
-    statusDate: "",
-  });
-  const [error, setError] = useState<null | string>(null);
-  const [isLoading, setLoading] = useState(false);
-  const httpRequest = useFetch();
-  const access = useDepartmentAccess(departmentId);
+// function NewCertificationForm({
+//   departmentId,
+//   onClose,
+//   onAdd,
+// }: {
+//   departmentId: string;
+//   onClose: () => void;
+//   onAdd: (newCert: Certification) => void;
+// }) {
+//   const [blankFields, setBlankFields] = useState<{
+//     title: string;
+//     examCode: string;
+//     examLink: string;
+//     status: string;
+//     statusDate: string;
+//     employeeId?: string;
+//   }>({
+//     title: "",
+//     examCode: "",
+//     examLink: "",
+//     status: "projected",
+//     statusDate: "",
+//   });
+//   const [error, setError] = useState<null | string>(null);
+//   const [isLoading, setLoading] = useState(false);
+//   const httpRequest = useFetch();
+//   const access = useDepartmentAccess(departmentId);
 
-  async function handleAdd(e: any) {
-    e.preventDefault();
-    if (isLoading || !blankFields) return;
-    setLoading(true);
-    setError(null);
+//   async function handleAdd(e: any) {
+//     e.preventDefault();
+//     if (isLoading || !blankFields) return;
+//     setLoading(true);
+//     setError(null);
 
-    const { data, error } = await httpRequest<Certification>(
-      `/certifications`,
-      {
-        method: "POST",
-        body: JSON.stringify({
-          title: blankFields.title,
-          examCode: blankFields.examCode,
-          examLink: blankFields.examLink,
-          status: blankFields.status,
-          employeeId: blankFields.employeeId,
-          departmentId: departmentId,
-          [blankFields.status === "projected"
-            ? "dateProjected"
-            : "dateCompleted"]: blankFields.statusDate,
-        }),
-      }
-    );
-    setLoading(false);
-    if (error) {
-      console.log(error);
-      setError(error.message);
-      return;
-    }
+//     const { data, error } = await httpRequest<Certification>(
+//       `/certifications`,
+//       {
+//         method: "POST",
+//         body: JSON.stringify({
+//           title: blankFields.title,
+//           examCode: blankFields.examCode,
+//           examLink: blankFields.examLink,
+//           status: blankFields.status,
+//           employeeId: blankFields.employeeId,
+//           departmentId: departmentId,
+//           [blankFields.status === "projected"
+//             ? "dateProjected"
+//             : "dateCompleted"]: blankFields.statusDate,
+//         }),
+//       }
+//     );
+//     setLoading(false);
+//     if (error) {
+//       console.log(error);
+//       setError(error.message);
+//       return;
+//     }
 
-    if (data && Object.keys(data).length > 0) {
-      onClose();
-      onAdd(data);
-    }
-  }
-  return (
-    <Panel variant="raised" style={{ padding: 20 }}>
-      <Form onSubmit={handleAdd}>
-        <Grid hasGutter md={6}>
-          <GridItem span={12}>
-            <FormGroup label="Title">
-              <TextInput
-                aria-label="title"
-                value={blankFields.title}
-                onChange={(_e, title) =>
-                  setBlankFields({ ...blankFields, title })
-                }
-                placeholder="Ex: Red Hat Certified System Administrator"
-                isDisabled={isLoading}
-              />
-            </FormGroup>
-          </GridItem>
-          <GridItem span={3}>
-            <FormGroup label="Exam Code">
-              <TextInput
-                aria-label="exam-code"
-                value={blankFields.examCode}
-                onChange={(_e, examCode) =>
-                  setBlankFields({ ...blankFields, examCode })
-                }
-                placeholder="Ex: EX200"
-                isDisabled={isLoading}
-              />
-            </FormGroup>
-          </GridItem>
-          <GridItem span={9}>
-            <FormGroup label="Exam Link">
-              <TextInput
-                aria-label="exam-link"
-                value={blankFields.examLink}
-                onChange={(_e, examLink) =>
-                  setBlankFields({ ...blankFields, examLink })
-                }
-                placeholder="Ex: https://www.redhat.com/en/services/certification/rhcsa"
-                isDisabled={isLoading}
-              />
-            </FormGroup>
-          </GridItem>
-          <GridItem span={3}>
-            <FormGroup label="Status">
-              <Radio
-                name="status"
-                label={
-                  <>
-                    Projected <CalendarAltIcon style={{ color: "orange" }} />
-                  </>
-                }
-                id="status-01"
-                checked={blankFields.status === "projected"}
-                onChange={(_e, checked) =>
-                  setBlankFields({
-                    ...blankFields,
-                    status: checked ? "projected" : "completed",
-                    statusDate: "",
-                  })
-                }
-                isDisabled={isLoading}
-              />
-              <Radio
-                name="status"
-                label={
-                  <>
-                    Completed <CheckCircleIcon style={{ color: "green" }} />
-                  </>
-                }
-                id="status-02"
-                checked={blankFields.status === "completed"}
-                onChange={(_e, checked) =>
-                  setBlankFields({
-                    ...blankFields,
-                    status: checked ? "completed" : "projected",
-                    statusDate: "",
-                  })
-                }
-                isDisabled={isLoading}
-              />
-            </FormGroup>
-          </GridItem>
-          <GridItem>
-            <FormGroup
-              label={
-                blankFields.status === "projected"
-                  ? "Date Projected"
-                  : "Date Completed"
-              }
-            >
-              <DatePicker
-                value={blankFields.statusDate}
-                onChange={(_event, statusDate) =>
-                  setBlankFields({ ...blankFields, statusDate })
-                }
-                isDisabled={isLoading}
-              />
-            </FormGroup>
-          </GridItem>
-          {access === "lead" && (
-            <GridItem span={4}>
-              <FormGroup label="Employee">
-                <EmployeeSelect
-                  value={blankFields.employeeId || ""}
-                  onValueChange={(employeeId) =>
-                    setBlankFields({ ...blankFields, employeeId })
-                  }
-                  isDisabled={isLoading}
-                  departmentId={departmentId}
-                />
-              </FormGroup>
-            </GridItem>
-          )}
-        </Grid>
-        {error && <Alert variant="danger" isInline isPlain title={error} />}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "flex-start",
-            gap: 10,
-          }}
-        >
-          <Button
-            variant="primary"
-            isLoading={isLoading}
-            isDisabled={isLoading}
-            onClick={handleAdd}
-          >
-            Submit
-          </Button>
-          <Button variant="link" onClick={onClose} isDisabled={isLoading}>
-            Cancel
-          </Button>
-        </div>
-      </Form>
-    </Panel>
-  );
-}
+//     if (data && Object.keys(data).length > 0) {
+//       onClose();
+//       onAdd(data);
+//     }
+//   }
+//   return (
+//     <Panel variant="raised" style={{ padding: 20 }}>
+//       <Form onSubmit={handleAdd}>
+//         <Grid hasGutter md={6}>
+//           <GridItem span={12}>
+//             <FormGroup label="Title">
+//               <TextInput
+//                 aria-label="title"
+//                 value={blankFields.title}
+//                 onChange={(_e, title) =>
+//                   setBlankFields({ ...blankFields, title })
+//                 }
+//                 placeholder="Ex: Red Hat Certified System Administrator"
+//                 isDisabled={isLoading}
+//               />
+//             </FormGroup>
+//           </GridItem>
+//           <GridItem span={3}>
+//             <FormGroup label="Exam Code">
+//               <TextInput
+//                 aria-label="exam-code"
+//                 value={blankFields.examCode}
+//                 onChange={(_e, examCode) =>
+//                   setBlankFields({ ...blankFields, examCode })
+//                 }
+//                 placeholder="Ex: EX200"
+//                 isDisabled={isLoading}
+//               />
+//             </FormGroup>
+//           </GridItem>
+//           <GridItem span={9}>
+//             <FormGroup label="Exam Link">
+//               <TextInput
+//                 aria-label="exam-link"
+//                 value={blankFields.examLink}
+//                 onChange={(_e, examLink) =>
+//                   setBlankFields({ ...blankFields, examLink })
+//                 }
+//                 placeholder="Ex: https://www.redhat.com/en/services/certification/rhcsa"
+//                 isDisabled={isLoading}
+//               />
+//             </FormGroup>
+//           </GridItem>
+//           <GridItem span={3}>
+//             <FormGroup label="Status">
+//               <Radio
+//                 name="status"
+//                 label={
+//                   <>
+//                     Projected <CalendarAltIcon style={{ color: "orange" }} />
+//                   </>
+//                 }
+//                 id="status-01"
+//                 checked={blankFields.status === "projected"}
+//                 onChange={(_e, checked) =>
+//                   setBlankFields({
+//                     ...blankFields,
+//                     status: checked ? "projected" : "completed",
+//                     statusDate: "",
+//                   })
+//                 }
+//                 isDisabled={isLoading}
+//               />
+//               <Radio
+//                 name="status"
+//                 label={
+//                   <>
+//                     Completed <CheckCircleIcon style={{ color: "green" }} />
+//                   </>
+//                 }
+//                 id="status-02"
+//                 checked={blankFields.status === "completed"}
+//                 onChange={(_e, checked) =>
+//                   setBlankFields({
+//                     ...blankFields,
+//                     status: checked ? "completed" : "projected",
+//                     statusDate: "",
+//                   })
+//                 }
+//                 isDisabled={isLoading}
+//               />
+//             </FormGroup>
+//           </GridItem>
+//           <GridItem>
+//             <FormGroup
+//               label={
+//                 blankFields.status === "projected"
+//                   ? "Date Projected"
+//                   : "Date Completed"
+//               }
+//             >
+//               <DatePicker
+//                 value={blankFields.statusDate}
+//                 onChange={(_event, statusDate) =>
+//                   setBlankFields({ ...blankFields, statusDate })
+//                 }
+//                 isDisabled={isLoading}
+//               />
+//             </FormGroup>
+//           </GridItem>
+//           {access === "lead" && (
+//             <GridItem span={4}>
+//               <FormGroup label="Employee">
+//                 <EmployeeSelect
+//                   value={blankFields.employeeId || ""}
+//                   onValueChange={(employeeId) =>
+//                     setBlankFields({ ...blankFields, employeeId })
+//                   }
+//                   isDisabled={isLoading}
+//                   departmentId={departmentId}
+//                 />
+//               </FormGroup>
+//             </GridItem>
+//           )}
+//         </Grid>
+//         {error && <Alert variant="danger" isInline isPlain title={error} />}
+//         <div
+//           style={{
+//             display: "flex",
+//             justifyContent: "flex-start",
+//             gap: 10,
+//           }}
+//         >
+//           <Button
+//             variant="primary"
+//             isLoading={isLoading}
+//             isDisabled={isLoading}
+//             onClick={handleAdd}
+//           >
+//             Submit
+//           </Button>
+//           <Button variant="link" onClick={onClose} isDisabled={isLoading}>
+//             Cancel
+//           </Button>
+//         </div>
+//       </Form>
+//     </Panel>
+//   );
+// }
 
 function EditCertification({
   reportId,

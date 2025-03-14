@@ -1,17 +1,12 @@
 import {
   Content,
   ContentVariants,
-  EmptyState,
-  EmptyStateBody,
   PageSection,
   Panel,
 } from "@patternfly/react-core";
-import { UserIcon } from "@patternfly/react-icons";
 import { typedUseStoreState } from "../../store";
 import { User } from "../../types/user";
-import { Report } from "../../types/report";
 import { DepartmentCard } from "../../components/DepartmentCard";
-import { useEffect, useState } from "react";
 import { RecentReports } from "../../components/RecentReports";
 
 export default function Home() {

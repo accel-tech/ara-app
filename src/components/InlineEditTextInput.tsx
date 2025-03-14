@@ -1,7 +1,6 @@
 import { Button, TextInput } from "@patternfly/react-core";
 import {
   CheckIcon,
-  MinusIcon,
   PenIcon,
   TimesIcon,
   TrashIcon,

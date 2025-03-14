@@ -1,5 +1,5 @@
 import { Page } from "@patternfly/react-core";
-import { Fragment, useState } from "react";
+import { Fragment } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Header } from "../components/Header";
 import { ToolsWrapper } from "../components/ToolsWrapper";

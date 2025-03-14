@@ -18,7 +18,7 @@ import {
   MastheadContent,
 } from "@patternfly/react-core";
 import defaultAvatar from "../static/avatar.svg";
-import { usePreferencesModal } from "./ToolsWrapper";
+// import { usePreferencesModal } from "./ToolsWrapper";
 import { typedUseStoreState } from "../store";
 import { Link } from "react-router-dom";
 import { BellIcon as _BellIcon, BarsIcon } from "@patternfly/react-icons";
@@ -84,7 +84,7 @@ function UserDropdown() {
   const user = typedUseStoreState((state) => state.auth.user)!;
 
   const [isOpen, setOpen] = useState(false);
-  const openPreferencesModal = usePreferencesModal();
+  // const openPreferencesModal = usePreferencesModal();
 
   const onSelect = (
     _event: React.MouseEvent<Element, MouseEvent> | undefined,

@@ -1,17 +1,6 @@
-import { FC, Fragment, useState } from "react";
+import { FC, useState } from "react";
 import { Report } from "../types/report";
-import {
-  Button,
-  Card,
-  CardBody,
-  CardTitle,
-  Content,
-  Form,
-  FormGroup,
-  PageSection,
-  Title,
-  Tooltip,
-} from "@patternfly/react-core";
+import { Button, Form, FormGroup, Tooltip } from "@patternfly/react-core";
 import { InfoCircleIcon } from "@patternfly/react-icons";
 import { InlineEditTextInput } from "./InlineEditTextInput";
 import { useFetch } from "../hooks/useFetch";
@@ -28,7 +17,6 @@ import {
 import { Dashboard } from "./charts/Dashboard";
 import {
   ChartAxis,
-  ChartBar,
   ChartBulletQualitativeRange,
   ChartLegend,
   ChartThemeColor,

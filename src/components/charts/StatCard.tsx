@@ -4,11 +4,10 @@ import {
   CardBody,
   Skeleton,
   Tooltip,
-  Button,
 } from "@patternfly/react-core";
 import { FC, ReactNode } from "react";
 import { DataUnavailable } from "./DataUnavailable";
-import { InfoCircleIcon, InfoIcon } from "@patternfly/react-icons";
+import { InfoCircleIcon } from "@patternfly/react-icons";
 
 export type statCardProps = {
   title: string;

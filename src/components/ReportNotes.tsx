@@ -1,21 +1,7 @@
-import { FC, Fragment, useState } from "react";
+import { FC, useState } from "react";
 import { Report } from "../types/report";
-import {
-  Alert,
-  Button,
-  Form,
-  Icon,
-  List,
-  ListItem,
-  Panel,
-  TextInput,
-} from "@patternfly/react-core";
-import {
-  BullhornIcon,
-  CircleIcon,
-  MinusIcon,
-  PlusIcon,
-} from "@patternfly/react-icons";
+import { Alert, Button, Form, Panel, TextInput } from "@patternfly/react-core";
+import { PlusIcon } from "@patternfly/react-icons";
 import { useDepartmentAccess } from "../hooks/useDepartmentAccess";
 import { useFetch } from "../hooks/useFetch";
 import { typedUseStoreActions, typedUseStoreState } from "../store";

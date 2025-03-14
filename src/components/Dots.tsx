@@ -1,5 +1,4 @@
 import { FC, HTMLProps, useCallback, useEffect, useRef, useState } from "react";
-import { cl } from "../utils/misc";
 
 export const Dots: FC<
   { isAnimating: boolean; speed?: number } & HTMLProps<HTMLDivElement>

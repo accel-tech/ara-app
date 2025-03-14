@@ -25,7 +25,7 @@ export const DataComponent: FC<dataComponent> = ({
   description,
   component,
   span,
-  groupLabel,
+  // groupLabel,
 }) => {
   function Content() {
     switch (kind) {

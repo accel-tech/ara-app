@@ -1,7 +1,7 @@
 import { Department } from "./department";
 import { Certification } from "./certification";
 import { User } from "./user";
-import { Project, ReportProject } from "./project";
+import { ReportProject } from "./project";
 
 type RDNote = {
   _id: string;

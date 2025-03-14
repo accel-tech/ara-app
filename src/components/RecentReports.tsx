@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Report } from "../types/report";
 import { useFetch } from "../hooks/useFetch";
 import { LoadingReportCard, ReportCard } from "./ReportCard";

@@ -1,4 +1,4 @@
-import { FC, Fragment, useState } from "react";
+import { FC, useState } from "react";
 import { useDepartment } from "../hooks/useDepartment";
 import {
   Modal,
@@ -13,11 +13,10 @@ import {
   ModalFooter,
   Button,
   Alert,
-  AlertActionLink,
 } from "@patternfly/react-core";
 import { useFetch } from "../hooks/useFetch";
 import { departmentToUrl } from "../utils/misc";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export const CreateReportModal: FC<{
   departmentId: string | null;

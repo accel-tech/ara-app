@@ -1,9 +1,4 @@
-import {
-  Card,
-  CardBody,
-  Content,
-  ContentVariants,
-} from "@patternfly/react-core";
+import { Card, CardBody, Content } from "@patternfly/react-core";
 import { BuildingIcon } from "@patternfly/react-icons";
 import { FC } from "react";
 import { capitalizeFirstLetter, departmentToUrl } from "../utils/misc";
